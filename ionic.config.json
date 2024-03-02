@@ -1,0 +1,7 @@
+{
+  "name": "kitchenapplication",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "react-vite"
+}
