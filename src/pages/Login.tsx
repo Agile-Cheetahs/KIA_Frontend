@@ -27,10 +27,19 @@ import { logInOutline } from 'ionicons/icons';
 import { useParams } from 'react-router';
 import { useState } from 'react';
 import './Login.css';
+import { validateEmail, validatePassword, validateUsername, validateEmpty } from '../helper/Validation';
 
 /* Login/Signup Landing Page
 */
 
+
+
+let validationMethodMap = {
+  "Username": validateUsername,
+  "Email": validateEmail,
+  "Password": validatePassword,
+  "PhoneNumber": validateEmpty
+}
 
 
 
@@ -40,12 +49,54 @@ function Login() {
 
 
   const [isTouched, setIsTouched] = useState(false);
-  const [isValid, setIsValid] = useState<boolean>();
+  const [isValid, setIsValid] = useState<boolean>(true);
+
+  const [isUserNameValid, setIsUserNameValid] = useState<boolean>(false);
+  const [isEmailValid, setIsEmailValid] = useState<boolean>(false);
+  const [isPasswordValid, setIsPasswordValid] = useState<boolean>(false);
+  const [isPhoneNumberValid, setIsPhoneNumberValid] = useState<boolean>(false);
+
+  let validateSetterMap = {
+    "Username": setIsUserNameValid,
+    "Email": setIsEmailValid,
+    "Password": setIsPasswordValid,
+    "PhoneNumber": setIsPhoneNumberValid
+  }
+
+  const isFormValid = () => {
+    if (isUserNameValid && isEmailValid && isPasswordValid) {
+      setIsValid(true);
+    } else {
+      setIsValid(false);
+    }
+  }
+
+  const validate = (ev: Event) => {
+    const value = (ev.target as HTMLInputElement).value;
+    const fieldName = (ev.target as HTMLInputElement).label;
+    console.log(fieldName);
+    const validateMethod = validationMethodMap[fieldName];
+    const validateSetter = validateSetterMap[fieldName];
+
+    console.log(validateMethod);
+    console.log(validateSetter);
+    //validateSetter(false);
+
+    if (value === '') return;
+
+    if (validateMethod(value) !== null) { validateSetter(true); }
+    else { validateSetter(false); }
+  };
+
+  const [isUserNameMissing, setIsUserNameMissing] = useState<boolean>();
+  const [isEmailMissing, setIsEmailMissing] = useState<boolean>();
+  const [isPasswordMissing, setIsPasswordMissing] = useState<boolean>();
 
   // Event callback methods
   const clearForms = () => {
     setIsTouched(false);
     setIsValid(false);
+    //clear form input
   }
 
   const markTouched = () => {
@@ -74,6 +125,7 @@ function Login() {
                     label-placement="stacked"
                     placeholder="First Name Last Name"
                     errorText="Please enter a valid username"
+                    onIonInput={(event) => validate(event)}
                   ></IonInput>
                 </IonItem>
                 <IonItem >
@@ -82,7 +134,8 @@ function Login() {
                     label="Email"
                     label-placement="stacked"
                     placeholder="email@domain.com"
-                    errorText="Please enter a valid Email Id"
+                    errorText="Email ID should not have invalid characters"
+                    onIonInput={(event) => validate(event)}
                   ></IonInput>
                 </IonItem>
 
@@ -92,7 +145,8 @@ function Login() {
                     label="PhoneNumber"
                     label-placement="stacked"
                     placeholder="(000)-000-0000"
-                    errorText="Please enter a valid phone number"
+                    errorText="Only Numbers allowed in US format"
+                    onIonInput={(event) => validate(event)}
                   ></IonInput>
                 </IonItem>
 
@@ -103,14 +157,24 @@ function Login() {
                     maxlength={30}
                     label-placement="stacked" placeholder="Enter a password"
                     helperText=""
-                    errorText="Please enter a valid password"
+                    errorText="Password should contain atleast 8 characters with 1 capital letter, lowercase, 1 number and 1 special character"
+                    onIonInput={(event) => validate(event)}
                   ></IonInput>
                   {/* <IonNote>Password should be of </IonNote> */}
                 </IonItem>
-                <IonButton expand="block" className="registerButtonSpan"> <IonIcon color="white" icon={logInOutline} size="medium"></IonIcon>
+                <IonButton
+                  expand="block"
+                  className="registerButtonSpan"
+                  disabled={!(isUserNameValid && isEmailValid && isPasswordValid)}
+                > <IonIcon color="white" icon={logInOutline} size="medium"></IonIcon>
                   REGISTER </IonButton>
                 <IonItem lines="none">
-                  Have an Account?  <IonButton fill="clear" onClick={() => setLoginType(0)}> Sign in. </IonButton>
+                  Have an Account?  <IonButton fill="clear" onClick={() => {
+                    
+                    setLoginType(0);
+                    
+                    clearForms();
+                  }}> Sign in. </IonButton>
                 </IonItem>
 
                 {/* </IonItem> */}
@@ -133,7 +197,8 @@ function Login() {
                     maxlength={40}
                     label-placement="stacked"
                     placeholder="Enter an username"
-                    errorText="Please enter a valid username"
+                    errorText="Username should be of atleast 8 characters consisting of alphabets and numbers"
+                    onIonInput={(event) => validate(event)}
                   ></IonInput>
                 </IonItem>
 
@@ -145,14 +210,23 @@ function Login() {
                     label-placement="stacked" placeholder="Enter a password"
                     helperText=""
                     errorText="Please enter a valid password"
+                    onIonInput={(event) => validate(event)}
                   ></IonInput>
                   {/* <IonNote>Password should be of </IonNote> */}
                 </IonItem>
                 {/* <IonItem className="signInButtonSpan"> */}
-                <IonButton expand="block" className="signInButtonSpan"> <IonIcon color="white" icon={logInOutline} size="medium"></IonIcon>
-                  Sign in </IonButton>
+                <IonButton
+                  expand="block"
+                  className="signInButtonSpan"
+                  disabled={!(isUserNameValid && isPasswordValid)}
+                > <IonIcon color="white" icon={logInOutline} size="medium"></IonIcon>
+                  Sign in
+                </IonButton>
                 <IonItem lines="none">
-                  Don't Have an Account?  <IonButton fill="clear" onClick={() => setLoginType(1)}> Create Account. </IonButton>
+                  Don't Have an Account?  <IonButton fill="clear" onClick={() => 
+                  {setLoginType(1);
+                  
+                  }}> Create Account. </IonButton>
                 </IonItem>
 
                 {/* </IonItem> */}
