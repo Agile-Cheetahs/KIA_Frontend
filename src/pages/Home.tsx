@@ -7,14 +7,20 @@ import {
   IonButton,
   IonInput,
   IonList,
+  IonRouterLink,
   IonPage,
   IonRefresher,
   IonRefresherContent,
   IonTitle,
   IonToolbar,
-  useIonViewWillEnter
+  useIonViewWillEnter,
+  IonRouterOutlet
 } from '@ionic/react';
+import { IonReactRouter } from '@ionic/react-router';
+import { Route, Redirect } from 'react-router';
 import './Home.css';
+import KitchenPage from './KitchenPage';
+import InventoryPage from './InventoryPage';
 
 const Home: React.FC = () => {
 
@@ -46,17 +52,21 @@ const Home: React.FC = () => {
         <IonHeader collapse="condense">
           <IonToolbar>
             <IonTitle size="large">
-              Kitchen
+              KitchenPage
             </IonTitle>
           </IonToolbar>
-        </IonHeader>        
+        </IonHeader>         
         <IonInput placeholder="User Name"></IonInput>
-        <IonButton>Login</IonButton>
+        
+        <IonButton href="/kitchen">Login</IonButton>
+        
+        
         
       </IonContent>
     </IonPage>
   );
 };
+
 
 //{messages.map(m => <MessageListItem key={m.id} message={m} />)} 
 export default Home;
