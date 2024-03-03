@@ -22,6 +22,9 @@ import '@ionic/react/css/display.css';
 
 /* Theme variables */
 import './theme/variables.css';
+import InventoryPage from './pages/InventoryPage';
+import KitchenPage from './pages/KitchenPage';
+import ShoppingPage from './pages/ShoppingPage';
 
 setupIonicReact();
 
@@ -35,6 +38,15 @@ const App: React.FC = () => (
         <Route path="/home" exact={true}>
           <Home />
         </Route>
+        <Route path="/kitchen" exact={true}>
+          <KitchenPage/>
+        </Route>
+        <Route path="/inventory" exact={true}>
+            <InventoryPage />
+        </Route>
+        <Route path="/shopping" exact={true}>
+            <ShoppingPage />
+        </Route>        
         <Route path="/message/:id">
            <ViewMessage />
         </Route>
