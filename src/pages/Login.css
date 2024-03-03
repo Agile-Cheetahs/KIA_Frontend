@@ -1,0 +1,22 @@
+    /* TODO: customize for android mobile*/
+
+.loginCard, .registerCard {
+    display: flex;
+    gap: 2% 2%;
+
+    width: 30%;
+    margin: auto;
+    flex-direction: column;
+}
+
+.signInButtonSpan., .registerButtonSpan {
+    width: 30%;
+    margin: auto;
+
+    margin-top: 3%;
+    margin-bottom: 3%;
+}
+
+ion-item {
+
+}
