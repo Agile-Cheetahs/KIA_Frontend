@@ -13,7 +13,7 @@ export const validateEmpty = (string) => {
 export const validateEmail = (email: string) => {
     // Taken from the Ionic docs
     if (!email) {
-        return false;
+        return  null;
     }
     return email.match(
       /^(?=.{1,254}$)(?=.{1,64}@)[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+)*@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/
