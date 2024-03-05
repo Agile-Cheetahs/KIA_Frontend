@@ -33,6 +33,13 @@ import { validateEmail, validatePassword, validateUsername, validateEmpty } from
 */
 
 
+interface InputMap {
+  "Username": string,
+    "Email": string,
+    "Password": string,
+    "PhoneNumber": string
+}
+
 
 let validationMethodMap = {
   "Username": validateUsername,
@@ -48,13 +55,18 @@ function Login() {
   const [loginType, setLoginType] = useState(0);
 
 
-  const [isTouched, setIsTouched] = useState(false);
+  
   const [isValid, setIsValid] = useState<boolean>(true);
 
   const [isUserNameValid, setIsUserNameValid] = useState<boolean>(false);
   const [isEmailValid, setIsEmailValid] = useState<boolean>(false);
   const [isPasswordValid, setIsPasswordValid] = useState<boolean>(false);
   const [isPhoneNumberValid, setIsPhoneNumberValid] = useState<boolean>(false);
+
+  const [isUserNameTouched, setIsUserNameTouched] = useState<boolean>(false);
+  const [isEmailTouched, setIsEmailTouched] = useState<boolean>(false);
+  const [isPasswordTouched, setIsPasswordTouched] = useState<boolean>(false);
+  const [isPhoneNumberTouched, setPhoneNumberTouched] = useState<boolean>(false);
 
   // state of each field value (used for clearing fields)
   const [loginFormState, setLoginFormState] = useState({
@@ -67,10 +79,10 @@ function Login() {
 
 
   let validateSetterMap = {
-    "Username": setIsUserNameValid,
-    "Email": setIsEmailValid,
-    "Password": setIsPasswordValid,
-    "PhoneNumber": setIsPhoneNumberValid
+    "Username": [isUserNameValid, setIsUserNameValid],
+    "Email": [isEmailValid, setIsEmailValid],
+    "Password": [isPasswordValid, setIsPasswordValid],
+    "PhoneNumber": [isPhoneNumberValid, setIsPhoneNumberValid]
   }
 
   let formStateFieldMap = {
@@ -88,6 +100,11 @@ function Login() {
   //   }
   // }
 
+  const formInputClassName = (fieldName: string) => {
+    const validateField = validateSetterMap[fieldName][1];
+    return `${validateField && 'ion-valid'} ${validateField === false && 'ion-invalid'} ${ 'ion-touched'}`
+  }
+
   // generic method for all input event callbacks.
   const validate = (ev: Event) => {
     const value = (ev.target as HTMLInputElement).value;
@@ -95,7 +112,7 @@ function Login() {
     
     // select the correct field
     const validateMethod = validationMethodMap[fieldName];
-    const validateSetter = validateSetterMap[fieldName];
+    const validateSetter = validateSetterMap[fieldName][1];
     const fieldSetter = formStateFieldMap[fieldName];
 
 
@@ -124,11 +141,11 @@ function Login() {
 
   // Event callback methods
   const clearForms = () => {
-    setIsTouched(false);
+    //setIsTouched(false);
     setIsValid(false);
     //clear form input
     Object.values(validateSetterMap).forEach(validator => {
-      validator('');
+      validator[1]('');
     });
     setLoginFormState({
       userName: "",
@@ -159,6 +176,7 @@ function Login() {
                 <IonItem >
                   <IonInput
                     type="text"
+                    className={formInputClassName("Username")}
                     label="Username"
                     maxlength={40}
                     label-placement="stacked"
@@ -172,6 +190,7 @@ function Login() {
                 <IonItem >
                   <IonInput
                     type="email"
+                    className={formInputClassName("Email")}
                     label="Email"
                     label-placement="stacked"
                     placeholder="email@domain.com"
@@ -185,6 +204,7 @@ function Login() {
                 <IonItem >
                   <IonInput
                     type="tel"
+                    className={formInputClassName("PhoneNumber")}
                     label="PhoneNumber"
                     label-placement="stacked"
                     placeholder="(000)-000-0000"
@@ -198,6 +218,7 @@ function Login() {
                 <IonItem >
                   <IonInput
                     type="password"
+                    className={formInputClassName("Password")}
                     label="Password"
                     maxlength={30}
                     label-placement="stacked" placeholder="Enter a password"
@@ -241,6 +262,7 @@ function Login() {
                 <IonItem >
                   <IonInput
                     type="text"
+                    className={formInputClassName("Username")}
                     label="Username"
                     maxlength={40}
                     label-placement="stacked"
@@ -255,6 +277,7 @@ function Login() {
                 <IonItem >
                   <IonInput
                     type="password"
+                    className={formInputClassName("Password")}
                     label="Password"
                     maxlength={30}
                     label-placement="stacked" placeholder="Enter a password"
