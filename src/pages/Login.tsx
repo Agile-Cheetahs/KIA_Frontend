@@ -32,12 +32,18 @@ import { validateEmail, validatePassword, validateUsername, validateEmpty } from
 /* Login/Signup Landing Page
 */
 
+//Typescript interface 
+interface InputFieldMap {
+  "Username": string | any[],
+    "Email": string  | any[],
+    "Password": string  | any[],
+    "PhoneNumber": string  | any[]
+}
 
-interface InputMap {
-  "Username": string,
-    "Email": string,
-    "Password": string,
-    "PhoneNumber": string
+// TODO: refactor this
+const errorLabels = {
+  "username":"Username should be of atleast 8 characters consisting of alphabets and/or numbers",
+  "password": "Password should contain atleast 8 characters with 1 capital letter, lowercase, 1 number and 1 special character"
 }
 
 
@@ -77,15 +83,15 @@ function Login() {
   });
 
 
-
-  let validateSetterMap = {
-    "Username": [isUserNameValid, setIsUserNameValid],
-    "Email": [isEmailValid, setIsEmailValid],
-    "Password": [isPasswordValid, setIsPasswordValid],
-    "PhoneNumber": [isPhoneNumberValid, setIsPhoneNumberValid]
+// INput specific maps with each field
+  let inputFieldStateMap : InputFieldMap = {
+    "Username": [isUserNameValid, setIsUserNameValid, isUserNameTouched, setIsUserNameTouched],
+    "Email": [isEmailValid, setIsEmailValid, isEmailTouched, setIsEmailTouched],
+    "Password": [isPasswordValid, setIsPasswordValid, isPasswordTouched, setIsPasswordTouched],
+    "PhoneNumber": [isPhoneNumberValid, setIsPhoneNumberValid, isPhoneNumberTouched, setPhoneNumberTouched]
   }
 
-  let formStateFieldMap = {
+  let inputFieldNameMap : InputFieldMap = {
     "Username": "userName",
     "Email": "email",
     "Password": "password",
@@ -101,8 +107,8 @@ function Login() {
   // }
 
   const formInputClassName = (fieldName: string) => {
-    const validateField = validateSetterMap[fieldName][1];
-    return `${validateField && 'ion-valid'} ${validateField === false && 'ion-invalid'} ${ 'ion-touched'}`
+    const validateField = inputFieldStateMap[fieldName][0];
+    return `${validateField && 'ion-valid'} ${validateField === false && 'ion-invalid'} ${ inputFieldStateMap[fieldName][2] && 'ion-touched'}`
   }
 
   // generic method for all input event callbacks.
@@ -112,8 +118,8 @@ function Login() {
     
     // select the correct field
     const validateMethod = validationMethodMap[fieldName];
-    const validateSetter = validateSetterMap[fieldName][1];
-    const fieldSetter = formStateFieldMap[fieldName];
+    const validateSetter = inputFieldStateMap[fieldName][1];
+    const fieldSetter = inputFieldNameMap[fieldName];
 
 
 
@@ -135,16 +141,12 @@ function Login() {
   };
 
 
-  const [isUserNameMissing, setIsUserNameMissing] = useState<boolean>();
-  const [isEmailMissing, setIsEmailMissing] = useState<boolean>();
-  const [isPasswordMissing, setIsPasswordMissing] = useState<boolean>();
-
   // Event callback methods
   const clearForms = () => {
     //setIsTouched(false);
     setIsValid(false);
     //clear form input
-    Object.values(validateSetterMap).forEach(validator => {
+    Object.values(inputFieldStateMap).forEach(validator => {
       validator[1]('');
     });
     setLoginFormState({
@@ -154,10 +156,6 @@ function Login() {
       password: ""
     });
   }
-
-  const markTouched = () => {
-    setIsTouched(true);
-  };
 
 
   return (
@@ -182,8 +180,9 @@ function Login() {
                     label-placement="stacked"
                     placeholder="First Name Last Name"
                     value={loginFormState.userName}
-                    errorText="Please enter a valid username"
-                    onIonChange={(event) => validate(event)}
+                    errorText={errorLabels["username"]}
+                    onIonBlur={()=> inputFieldStateMap["Username"][3](true)}
+                    //onIonChange={(event) => validate(event)}
                     onIonInput={(event) => validate(event)}
                   ></IonInput>
                 </IonItem>
@@ -196,7 +195,8 @@ function Login() {
                     placeholder="email@domain.com"
                     value={loginFormState.email}
                     errorText="Email ID should not have invalid characters"
-                    onIonChange={(event) => validate(event)}
+                    onIonBlur={()=> inputFieldStateMap["Email"][3](true)}
+                    //onIonChange={(event) => validate(event)}
                     onIonInput={(event) => validate(event)}
                   ></IonInput>
                 </IonItem>
@@ -210,7 +210,8 @@ function Login() {
                     placeholder="(000)-000-0000"
                     value={loginFormState.userPhone}
                     errorText="Only Numbers allowed in US format"
-                    onIonChange={(event) => validate(event)}
+                    onIonBlur={()=> inputFieldStateMap["PhoneNumber"][3](true)}
+                    onIonInput={(event) => validate(event)}
                    //onIonChange={(event) => validate(event)}
                   ></IonInput>
                 </IonItem>
@@ -224,8 +225,9 @@ function Login() {
                     label-placement="stacked" placeholder="Enter a password"
                     value={loginFormState.password}
                     helperText=""
-                    errorText="Password should contain atleast 8 characters with 1 capital letter, lowercase, 1 number and 1 special character"
-                    onIonChange={(event) => validate(event)}
+                    errorText={errorLabels["password"]}
+                    onIonBlur={()=> inputFieldStateMap["Password"][3](true)}
+                    onIonInput={(event) => validate(event)}
                     //onIonInput={(event) => validate(event)}
                   ></IonInput>
                   {/* <IonNote>Password should be of </IonNote> */}
@@ -268,8 +270,9 @@ function Login() {
                     label-placement="stacked"
                     value={loginFormState.userName}
                     placeholder="Enter an username"
-                    errorText="Username should be of atleast 8 characters consisting of alphabets and numbers"
-                    onIonChange={(event) => validate(event)}
+                    errorText={errorLabels["username"]}
+                    onIonBlur={()=> inputFieldStateMap["Username"][3](true)}
+                    //onIonChange={(event) => validate(event)}
                     onIonInput={(event) => validate(event)}
                   ></IonInput>
                 </IonItem>
@@ -282,9 +285,9 @@ function Login() {
                     maxlength={30}
                     label-placement="stacked" placeholder="Enter a password"
                     value={loginFormState.password}
-                    helperText=""
-                    errorText="Please enter a valid password"
-                    onIonChange={(event) => validate(event)}
+                    onIonBlur={()=> inputFieldStateMap["Password"][3](true)}
+                    errorText={errorLabels["password"]}
+                   // onIonChange={(event) => validate(event)}
                     onIonInput={(event) => validate(event)}
                   ></IonInput>
                   {/* <IonNote>Password should be of </IonNote> */}
