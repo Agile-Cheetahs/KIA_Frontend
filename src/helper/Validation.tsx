@@ -6,7 +6,7 @@ Helper functions for validating input components in Login/Register Page
 Each input component will have a respective validation method
 
 */
-export const validateEmpty = (string) => {
+export const validateEmpty = (str: string) => {
     return true;
 }
 
@@ -31,7 +31,7 @@ export const validateEmail = (email: string) => {
 
   export const validateUsername = (username: string) => {
     return username.match(
-        /^[A-Za-z][A-Za-z0-9_]{7,29}$/
+        /^[A-Za-z][A-Za-z0-9_ ]{7,29}$/
     );
   }
 
