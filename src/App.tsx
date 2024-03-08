@@ -1,4 +1,5 @@
 import { Redirect, Route } from 'react-router-dom';
+import { useState } from 'react';
 import { IonApp, IonRouterOutlet, setupIonicReact } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
 import Home from './pages/Home';
@@ -29,14 +30,16 @@ import ShoppingPage from './pages/ShoppingPage';
 
 setupIonicReact();
 
-const App: React.FC = () => (
-  <IonApp>
+const App: React.FC = () => {
+    // User login management - 
+  const [token, setToken] = useState<String>('');
+  return (<IonApp>
     <IonReactRouter>
       <IonRouterOutlet>
         <Route path="/" exact={true}>
           <Redirect to="/home" />
         </Route>
-        <Route path="/home" exact={true}>
+        <Route path="/home" exact={true} >
           <Home />
         </Route>
         <Route path="/kitchen" exact={true}>
@@ -49,11 +52,11 @@ const App: React.FC = () => (
             <ShoppingPage />
         </Route>        
         <Route path="/login">
-           <Login />
+           <Login setToken={setToken} />
         </Route>
       </IonRouterOutlet>
     </IonReactRouter>
-  </IonApp>
-);
+  </IonApp>);
+};
 
 export default App;

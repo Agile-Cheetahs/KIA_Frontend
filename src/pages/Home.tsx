@@ -22,7 +22,12 @@ import './Home.css';
 import KitchenPage from './KitchenPage';
 import InventoryPage from './InventoryPage';
 
+
+
+
 const Home: React.FC = () => {
+
+
 
   const [messages, setMessages] = useState<Message[]>([]);
 
@@ -68,5 +73,5 @@ const Home: React.FC = () => {
 };
 
 
-//{messages.map(m => <MessageListItem key={m.id} message={m} />)} 
+
 export default Home;
