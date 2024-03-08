@@ -8,27 +8,23 @@ import {
   IonIcon,
   IonCard,
   IonCardContent,
-  IonCardHeader,
-  IonCardSubtitle,
-  IonCardTitle,
   IonItem,
-  IonLabel,
+
   IonList,
-  IonNote,
   IonTitle,
   IonInput,
   IonPage,
   IonToolbar,
-  IonCol, IonGrid, IonRow,
   useIonViewWillEnter,
   IonButton,
+  useIonToast
 } from '@ionic/react';
 import { logInOutline } from 'ionicons/icons';
 import { useParams } from 'react-router';
 import { useState, useRef } from 'react';
 import './Login.css';
-import { validateEmail, validatePassword, validateUsername, validateEmpty } from '../helper/Validation';
-import { register } from '../helper/APIRequest';
+import { validateEmail, validatePassword, validateUsername, validateEmpty, validatePhoneNumber } from '../helper/Validation';
+import { register, login } from '../helper/APIRequest';
 
 /* Login/Signup Landing Page
 */
@@ -43,7 +39,7 @@ interface InputFieldMap {
 
 // TODO: refactor this
 const errorLabels = {
-  "username": "Username should be of atleast 8 characters consisting of alphabets and/or numbers",
+  "username": "Username should be of 2 words separated by space consisting of alphabets and/or numbers",
   "password": "Password should contain atleast 8 characters with 1 capital letter, lowercase, 1 number and 1 special character"
 }
 
@@ -52,8 +48,34 @@ let validationMethodMap = {
   "Username": validateUsername,
   "Email": validateEmail,
   "Password": validatePassword,
-  "PhoneNumber": validateEmpty
+  "PhoneNumber": validatePhoneNumber
 }
+
+// Helper method - TODO: refactor later!
+
+function concatenateArraysAndJoin(obj: object) {
+
+  let combinedArray: string[] = [];
+
+
+  for (const key in obj) {
+
+    if (obj.hasOwnProperty(key)) {
+
+      if (Array.isArray(obj[key])) {
+
+        combinedArray = combinedArray.concat(obj[key]);
+      }
+    }
+  }
+
+  // Join the elements of the combinedArray into a string, separated by commas
+  const resultString = combinedArray.join(',');
+
+  // Return the resulting string
+  return resultString;
+}
+
 
 
 
@@ -61,9 +83,12 @@ const Login = (props) => {
   // 0 -> sign in, 1 -> Create account
   const [loginType, setLoginType] = useState(0);
 
+  const [errorToast] = useIonToast();
+  const [messageToast] = useIonToast();
 
 
-  const [isValid, setIsValid] = useState<boolean>(true);
+
+  //const [isValid, setIsValid] = useState<boolean>(true);
 
   const [isUserNameValid, setIsUserNameValid] = useState<boolean>(false);
   const [isEmailValid, setIsEmailValid] = useState<boolean>(false);
@@ -144,8 +169,7 @@ const Login = (props) => {
 
   // Event callback methods
   const clearForms = () => {
-    //setIsTouched(false);
-    setIsValid(false);
+
     //clear form input
     Object.values(inputFieldStateMap).forEach(validator => {
       validator[1]('');
@@ -236,8 +260,9 @@ const Login = (props) => {
                 <IonButton
                   expand="block"
                   className="registerButtonSpan"
-                  disabled={!(isUserNameValid && isEmailValid && isPasswordValid)}
+                  disabled={!(isUserNameValid && isEmailValid && isPasswordValid && isPhoneNumberValid)}
                   onClick={
+                    // register button signup
                     () => {
                       const usernameSplit = loginFormState.userName.split(' ');
                       const registerRequest = {
@@ -252,18 +277,25 @@ const Login = (props) => {
 
                       register(registerRequest).then((resp) => {
                         if (resp.response == "failed") {
-                          // TODO: handle failure
-                          /* {
-                          "email": [
-                          "account with this email already exists."
-                          ],
-                          "phone_number": [
-                          "account with this phone number already exists."
-                          ]
-                          }
+                          const msg = concatenateArraysAndJoin(resp.data);
 
-                          */
+                        errorToast({
+                          message: msg,
+                          duration: 1500,
+                          position: "top",
+                        });
+
+                          
                         } else if (resp.response == "successful") {
+                          const msg = "User registered succesfully!";
+
+                          messageToast({
+                            message: msg,
+                            duration: 1500,
+                            position: "top",
+                          });
+                          // set the login token here.
+                          props.setToken(resp.token);
                           // set the login token here.
                           props.setToken(resp.token);
                         }
@@ -289,30 +321,23 @@ const Login = (props) => {
                   }}> Sign in. </IonButton>
                 </IonItem>
 
-                {/* </IonItem> */}
-
               </IonCardContent>
 
             </IonCard>
             :
             <IonCard className='loginCard'>
-              {/* <IonCardHeader>
-              <IonCardTitle>Card Title</IonCardTitle>
-              <IonCardSubtitle>Card Subtitle</IonCardSubtitle>
-            </IonCardHeader> */}
 
               <IonCardContent>
                 <IonItem >
-                  <IonInput
-                    type="text"
-                    className={formInputClassName("Username")}
-                    label="Username"
-                    maxlength={40}
+                <IonInput
+                    type="email"
+                    className={formInputClassName("Email")}
+                    label="Email"
                     label-placement="stacked"
-                    value={loginFormState.userName}
-                    placeholder="Enter an username"
-                    errorText={errorLabels["username"]}
-                    onIonBlur={() => inputFieldStateMap["Username"][3](true)}
+                    placeholder="email@domain.com"
+                    value={loginFormState.email}
+                    errorText="Email ID should not have invalid characters"
+                    onIonBlur={() => inputFieldStateMap["Email"][3](true)}
                     //onIonChange={(event) => validate(event)}
                     onIonInput={(event) => validate(event)}
                   ></IonInput>
@@ -323,8 +348,8 @@ const Login = (props) => {
                     type="password"
                     className={formInputClassName("Password")}
                     label="Password"
-                    maxlength={30}
-                    label-placement="stacked" placeholder="Enter a password"
+                    maxlength={20}
+                    label-placement="stacked"
                     value={loginFormState.password}
                     onIonBlur={() => inputFieldStateMap["Password"][3](true)}
                     errorText={errorLabels["password"]}
@@ -337,7 +362,43 @@ const Login = (props) => {
                 <IonButton
                   expand="block"
                   className="signInButtonSpan"
-                  disabled={!(isUserNameValid && isPasswordValid)}
+                  disabled={!(isEmailValid && isPasswordValid)}
+                  onClick={() => {
+                    const siginRequest = {
+                      "username": loginFormState.email,
+                      "password": loginFormState.password,
+                    };
+
+                    login(siginRequest).then((resp) => {
+                      if (resp.response == "failed") {
+
+
+                        // merge together all response error message for a toast message.
+                        const msg = concatenateArraysAndJoin(resp.data);
+
+                        errorToast({
+                          message: msg,
+                          duration: 1500,
+                          position: "top",
+                        });
+
+                      } else if (resp.response == "successful") {
+                        const msg = "User logged in succesfully!";
+
+                        messageToast({
+                          message: msg,
+                          duration: 1500,
+                          position: "top",
+                        });
+                        // set the login token here.
+                        props.setToken(resp.token);
+                        //go to home page from here?
+                      }
+                    });
+
+
+
+                  }}
                 > <IonIcon color="white" icon={logInOutline} size="medium"></IonIcon>
                   Sign in
                 </IonButton>
@@ -355,30 +416,6 @@ const Login = (props) => {
               </IonCardContent>
             </IonCard>
           }
-          {/* /* <IonItem >
-            <IonInput 
-                label="Username"
-                maxlength={40}  
-                helperText="Enter an username"
-                errorText="Please enter a valid username"
-            ></IonInput>
-          </IonItem>
-
-          <IonItem >
-            <IonInput 
-                label="password"
-                maxlength={30}  
-                helperText="Enter a password"
-                errorText="Please enter a valid password"
-            ></IonInput>
-              <IonNote>Password should be of </IonNote>
-          </IonItem>
-          <IonItem>
-            <IonButton expand="block"> <IonIcon color="white" slot="start" icon={logInOutline} size="large"></IonIcon>
-                    Sign in </IonButton>
-            
-          </IonItem>
-       */}
 
 
         </IonList>
