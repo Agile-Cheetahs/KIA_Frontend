@@ -6,6 +6,7 @@ import Home from './pages/Home';
 import Login from './pages/Login';
 
 
+
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/react/css/core.css';
 
@@ -30,30 +31,50 @@ import ShoppingPage from './pages/ShoppingPage';
 
 setupIonicReact();
 
+
+
 const App: React.FC = () => {
     // User login management - 
-  const [token, setToken] = useState<String>('');
+    const getToken = () => {
+      const tokenString : string | null = sessionStorage.getItem('token');
+      const userToken = JSON.parse(tokenString);
+      return userToken;
+    };
+    const [token, setToken] = useState(getToken());
+    const saveToken = (userToken) => {
+      sessionStorage.setItem('token', JSON.stringify(userToken));
+      setToken(userToken);
+    };
+   
+    if (!token) {
+      return <Login setToken={saveToken} />;
+    }
+   
+  
+  // const {token, setToken} = useToken();
   return (<IonApp>
     <IonReactRouter>
       <IonRouterOutlet>
+        
         <Route path="/" exact={true}>
-          <Redirect to="/home" />
+          <Redirect to="/kitchen" /> 
         </Route>
-        <Route path="/home" exact={true} >
+        {/* TODO: remove /home? */}
+        {/* <Route path="/home" exact={true} >
           <Home />
-        </Route>
+        </Route> */}
         <Route path="/kitchen" exact={true}>
-          <KitchenPage/>
+          <KitchenPage token={token} setToken={saveToken} />
         </Route>
         <Route path="/inventory" exact={true}>
-            <InventoryPage />
+            <InventoryPage history={history} token={token}  setToken={saveToken}/>
         </Route>
         <Route path="/shopping" exact={true}>
-            <ShoppingPage />
+            <ShoppingPage setToken={saveToken}/>
         </Route>        
-        <Route path="/login">
-           <Login setToken={setToken} />
-        </Route>
+        {/* <Route path="/login">
+           <Login setToken={saveToken} />
+        </Route> */}
       </IonRouterOutlet>
     </IonReactRouter>
   </IonApp>);

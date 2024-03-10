@@ -9,7 +9,6 @@ import {
   IonCard,
   IonCardContent,
   IonItem,
-
   IonList,
   IonTitle,
   IonInput,
@@ -20,7 +19,7 @@ import {
   useIonToast
 } from '@ionic/react';
 import { logInOutline } from 'ionicons/icons';
-import { useParams } from 'react-router';
+import { Redirect, useParams } from 'react-router';
 import { useState, useRef } from 'react';
 import './Login.css';
 import { validateEmail, validatePassword, validateUsername, validateEmpty, validatePhoneNumber } from '../helper/Validation';
@@ -247,6 +246,7 @@ const Login = (props) => {
                     className={formInputClassName("Password")}
                     label="Password"
                     maxlength={30}
+                    clearOnEdit={false}
                     label-placement="stacked" placeholder="Enter a password"
                     value={loginFormState.password}
                     helperText=""
@@ -294,8 +294,6 @@ const Login = (props) => {
                             duration: 1500,
                             position: "top",
                           });
-                          // set the login token here.
-                          props.setToken(resp.token);
                           // set the login token here.
                           props.setToken(resp.token);
                         }
@@ -349,6 +347,7 @@ const Login = (props) => {
                     className={formInputClassName("Password")}
                     label="Password"
                     maxlength={20}
+                    clearOnEdit={false}
                     label-placement="stacked"
                     value={loginFormState.password}
                     onIonBlur={() => inputFieldStateMap["Password"][3](true)}
