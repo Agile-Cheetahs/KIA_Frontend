@@ -31,7 +31,7 @@ export const validateEmail = (email: string) => {
 
   export const validateUsername = (username: string) => {
     return username.match(
-        /^[A-Za-z0-9_]{1,20}\s+[A-Za-z0-9_]{1,20}$/
+        /^[A-Za-z0-9_]{1,20}\s+[A-Za-z0-9_]{1,40}$/
     );
   }
 

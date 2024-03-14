@@ -23,6 +23,7 @@ const InventoryPage = (props) => {
                 message: msg,
                 duration: 1500,
                 position: "top",
+                color: "warning"
               });
 
 
@@ -33,12 +34,13 @@ const InventoryPage = (props) => {
                 message: msg,
                 duration: 1500,
                 position: "top",
+                color: "success"
               });
               // set the login token here.
               props.setToken('');
+              props.history.push('/');
             }
-            //props.history.push('/login');
-
+            
           });
 
           
