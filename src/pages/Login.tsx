@@ -21,7 +21,7 @@ import {
 import { logInOutline } from 'ionicons/icons';
 import { Redirect, useParams } from 'react-router';
 import { useState, useRef } from 'react';
-import './Login.css';
+import './Login.scss';
 import { validateEmail, validatePassword, validateUsername, validateEmpty, validatePhoneNumber } from '../helper/Validation';
 import { register, login } from '../helper/APIRequest';
 
