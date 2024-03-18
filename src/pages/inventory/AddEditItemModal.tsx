@@ -15,15 +15,15 @@ import {
 } from '@ionic/react';
 import { OverlayEventDetail } from '@ionic/core/components';
 import './AddEditItemModal.scss';
-import { validateQuantity, validateUnits, validateUsername, validateEmpty, validateLocationTab } from '../../helper/Validation';
+import { validateQuantity, validateUnits, validateUsername, validateItemName, validateNumber, validateEmpty, validateLocationTab } from '../../helper/Validation';
 
 // COMMON CONSTANTS/ maps
 const ADD = "add";
 const EDIT = "edit";
 
 let validationMethodMap = {
-  "itemName": validateEmpty,
-  "quantity": validateEmpty,
+  "itemName": validateItemName,
+  "quantity": validateNumber,
   "units": validateEmpty,
   "locationTab": validateEmpty,
   "category": validateEmpty,
@@ -41,9 +41,18 @@ const AddEditItemModal = (props) => {
   const input = useRef<HTMLIonInputElement>(null);
 
   const action = props.action;
-  const locationTabList = [{id:1, name: "kitchen"},{id:2,name: "freezer"} ]// props.locationTabList;
-  const categoryList = [{id:1,name: "milk"},{id:2,name: "bananas"},{id:3,name: "cereal"} ]//props.categoryList;
-  const unitTypes = props.unitTypes;
+  const editItem = action == EDIT ? props.editItem : '';
+
+  // accept no selection also
+  const locationTabList = [{ id: 1, name: "kitchen" },
+  { id: 2, name: "freezer" }]// props.locationTabList;
+  const categoryList = [{ id: 1, name: "milk" },
+  { id: 2, name: "bananas" },
+  { id: 3, name: "cereal" }]//props.categoryList;
+  const unitTypes = [{ id: 1, name: "count" },
+  { id: 2, name: "lb" },
+  { id: 3, name: "oz" }]
+  //props.unitTypes;
 
   const [isItemNameValid, setIsItemNameValid] = useState<boolean>(false);
   const [isQuantityValid, setIsQuantityValid] = useState<boolean>(false);
@@ -61,23 +70,24 @@ const AddEditItemModal = (props) => {
   const [isExpirationDateTouched, setExpirationDateTouched] = useState<boolean>(false);
 
   const emptyItemState = {
-    "itemName": "",
-    "quantity": "",
-    "units": "",
-    "locationTab": "",
-    "category": "",
-    "expirationDate": ""
+    "itemName": action == EDIT ? "" : "", // TODO: edit item payload used to populate these values
+    "quantity": action == EDIT ? "" : "",
+    "units": action == EDIT ? "" : "",
+    "locationTab": action == EDIT ? "" : "",
+    "category": action == EDIT ? "" : "",
+    "expirationDate": action == EDIT ? "" : ""
   };
   const [itemState, setItemState] = useState(emptyItemState);
 
 
   // INput specific maps with each field - makes it easy for generic methods to set these
+  // is it neede
   let inputFieldStateMap = {
     "itemName": [isItemNameValid, setIsItemNameValid, isUserNameTouched, setIsUserNameTouched],
     "quantity": [isQuantityValid, setIsQuantityValid, isQuantityTouched, setIsQuantityTouched],
     "units": [isUnitsValid, setIsUnitsValid, isUnitsTouched, setIsUnitsTouched],
     "locationTab": [isLocationTabValid, setIsLocationTabValid, isLocationTabTouched, setLocationTabTouched],
-    "category": [isCategoryValid, setIsCategoryValid, isLocationTabTouched, setLocationTabTouched],
+    "category": [isCategoryValid, setIsCategoryValid, isCategoryTouched, setIsCategoryTouched],
     "expirationDate": [isExpirationDateValid, setIsExpirationDateValid, isExpirationDateTouched, setExpirationDateTouched]
   }
 
@@ -115,7 +125,7 @@ const AddEditItemModal = (props) => {
 
     // if (value === '') return;
     // validate also includes checking for blank values
-    if (validateMethod(value) !== null) {
+    if (validateMethod(value)) {
       validateSetter(true);
 
     }
@@ -136,15 +146,11 @@ const AddEditItemModal = (props) => {
   }
 
 
-
-
-
-
-
-
-
   function confirm() {
-    modal.current?.dismiss(input.current?.value, 'confirm');
+    // TODO: construct add/edit API method payload
+    const addEditObject = { ...itemState, action: action };
+
+    modal.current?.dismiss();
   }
 
   function onWillDismiss(ev: CustomEvent<OverlayEventDetail>) {
@@ -153,9 +159,9 @@ const AddEditItemModal = (props) => {
     }
   }
 
-  const compareSelectItems = (l1 : object, l2 : object) => {
-    return l1 && l2 ? l1.id === l2.id : l1 === l2;
-  }
+  // const compareSelectItems = (l1 : object, l2 : object) => {
+  //   return l1 && l2 ? l1.id === l2.id : l1 === l2;
+  // }
 
   return (
     <IonPage>
@@ -173,7 +179,11 @@ const AddEditItemModal = (props) => {
           <IonHeader>
             <IonToolbar>
               <IonButtons slot="start">
-                <IonButton onClick={() => modal.current?.dismiss()}>Cancel</IonButton>
+                <IonButton onClick={() => {
+                  clearForms();
+                  modal.current?.dismiss();
+                }
+                }>Cancel</IonButton>
               </IonButtons>
               <IonTitle>{`${action == ADD ? "Add " : "Edit "} Inventory item`}</IonTitle>
               <IonButtons slot="end">
@@ -195,13 +205,12 @@ const AddEditItemModal = (props) => {
                 type="text"
                 className={formInputClassName("itemName")}
                 label="itemName"
-                maxlength={60}
+                maxlength={40}
                 label-placement="stacked"
                 placeholder="Name of inventory item"
                 value={itemState.itemName}
                 // errorText={errorLabels["itemName"]}
                 onIonBlur={() => inputFieldStateMap["itemName"][3](true)}
-                //onIonChange={(event) => validate(event)}
                 onIonInput={(event) => validate(event)}
               ></IonInput>
             </IonItem>
@@ -211,11 +220,9 @@ const AddEditItemModal = (props) => {
                 className={formInputClassName("quantity")}
                 label="quantity"
                 label-placement="stacked"
-                placeholder="email@domain.com"
                 value={itemState.quantity}
-                errorText="Only numbers allowed"
+                errorText="Only positive numbers allowed"
                 onIonBlur={() => inputFieldStateMap["quantity"][3](true)}
-                //onIonChange={(event) => validate(event)}
                 onIonInput={(event) => validate(event)}
               ></IonInput>
             </IonItem>
@@ -227,29 +234,19 @@ const AddEditItemModal = (props) => {
                 label="units"
                 interface="popover"
                 className={formInputClassName("units")}
-                onIonChange={(event) => validate(event)}
+                value={itemState.units}
+                onIonChange={(event) => { setItemState((state) => { return { ...itemState, units: state }; }); validate(event); }}
                 onIonBlur={() => inputFieldStateMap["units"][3](true)}
                 onIonCancel={() => console.log('ionCancel fired')}
                 onIonDismiss={() => console.log('ionDismiss fired')}
                 placeholder="Select units">
                 {/*  TODO: hook up the units list here  */}
-                <IonSelectOption value="count">Count</IonSelectOption>
-                <IonSelectOption value="lb">Lb</IonSelectOption>
-                <IonSelectOption value="oz">Oz</IonSelectOption>
+                {unitTypes.map((unit: object) => (
+                  <IonSelectOption key={unit.id} value={unit.name}>
+                    {unit.name}
+                  </IonSelectOption>
+                ))}
               </IonSelect>
-
-              {/* <IonInput
-                type="tel"
-                
-                label="units"
-                maxlength={13}
-                label-placement="stacked"
-                placeholder="(000)-000-0000"
-               
-                
-               // onIonInput={(event) => validate(event)}
-              //onIonChange={(event) => validate(event)}
-              ></IonInput> */}
             </IonItem>
 
             <IonItem >
@@ -259,8 +256,9 @@ const AddEditItemModal = (props) => {
                 interface="popover"
                 label="locationTab"
                 className={formInputClassName("locationTab")}
-                compareWith={compareSelectItems}
-                onIonChange={(event) => validate(event)}
+                value={itemState.locationTab}
+                //compareWith={compareSelectItems}
+                onIonChange={(event) => { setItemState((state) => { return { ...itemState, locationTab: state }; }); validate(event); }}
                 onIonBlur={() => inputFieldStateMap["locationTab"][3](true)}
                 onIonCancel={() => console.log('ionCancel fired')}
                 onIonDismiss={() => console.log('ionDismiss fired')}
@@ -279,8 +277,9 @@ const AddEditItemModal = (props) => {
                 interface="popover"
                 label="category"
                 className={formInputClassName("category")}
-                compareWith={compareSelectItems}
-                onIonChange={(event) => validate(event)}
+                value={itemState.category}
+                //compareWith={compareSelectItems}
+                onIonChange={(event) => { setItemState((state) => { return { ...itemState, category: state }; }); validate(event); }}
                 onIonBlur={() => inputFieldStateMap["category"][3](true)}
                 onIonCancel={() => console.log('ionCancel fired')}
                 onIonDismiss={() => console.log('ionDismiss fired')}
@@ -299,7 +298,7 @@ const AddEditItemModal = (props) => {
                 className={formInputClassName("expirationDate")}
                 label="expirationDate"
                 clearOnEdit={false}
-                label-placement="stacked" placeholder="Enter an expiration date"
+                label-placement="stacked"
                 value={itemState.expirationDate}
                 helperText=""
                 //errorText={errorLabels["expirationDate"]}
@@ -309,8 +308,8 @@ const AddEditItemModal = (props) => {
             </IonItem>
           </IonContent>
         </IonModal>
-      </IonContent>
-    </IonPage>
+      </IonContent >
+    </IonPage >
   );
 }
 

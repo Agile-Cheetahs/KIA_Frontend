@@ -77,7 +77,7 @@ const App: React.FC = () => {
         </Route> 
                {/* Temporary  */}
          <Route path="/addinventory">
-           <AddEditItemModal  token={token} setToken={saveToken} />
+           <AddEditItemModal  token={token} setToken={saveToken} action={"add"} />
         </Route> 
       </IonRouterOutlet>
     </IonReactRouter>
