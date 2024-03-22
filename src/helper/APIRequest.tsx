@@ -74,6 +74,7 @@ export async function login(requestObject: Object) {
         // Log any errors to the console
         console.error("There has been a problem with your fetch operation:", error);
         const data = await response.json();
+s
         return { response: "failed", status: error.msg, data: data};
     }
 }
@@ -124,7 +125,7 @@ export async function logout(requestObject: Object) {
 /* Function for inventory page  */
 
 
-export async function addEditItems(requestObject: Object, isAdd: boolean) {
+export async function addEditItems(requestObject: Object,token: String, isAdd: boolean) {
     
     let response;
     try {
@@ -136,7 +137,7 @@ export async function addEditItems(requestObject: Object, isAdd: boolean) {
             method: isAdd ? 'POST' : 'PUT',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Token ${requestObject.token}`
+                'Authorization': `Token ${token}`
             },
             //  credentials: "include",
             body: JSON.stringify(requestObject),

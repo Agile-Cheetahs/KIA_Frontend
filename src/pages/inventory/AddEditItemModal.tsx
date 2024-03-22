@@ -49,7 +49,6 @@ let errorLabels = {
 
 
 
-
 const AddEditItemModal = (props) => {
 
   // props.item, props.token, props.action = "add" or "edit"
@@ -183,7 +182,7 @@ const AddEditItemModal = (props) => {
 
   function confirm() {
     // TODO: construct add/edit API method payload
-    const addEditObject = { ...itemState, action: action };
+    const addEditObject = { ...itemState };
 
 
 
@@ -193,13 +192,19 @@ const AddEditItemModal = (props) => {
       "quantity": addEditObject.quantity,
       "unit": addEditObject.units,
       "location": addEditObject.locationTab,
-      "category": addEditObject.category,
-      "expiration_date": addEditObject.expirationDate,
-      "id": action == ADD ? '' : '',
-      "token": props.token
+      "category": addEditObject.category
     };
 
-    addEditItems(addEditRequest, action == ADD).then((resp) => {
+    if (action == EDIT) {
+      // TODO: add string to the end
+      addEditRequest.id = "";
+    }
+
+    if (addEditObject.expirationDate) {
+      addEditRequest.expiration_date = addEditObject.expirationDate;
+    }
+
+    addEditItems(addEditRequest, props.token, action == ADD).then((resp) => {
       if (resp.response == "failed") {
         const msg = concatenateArraysAndJoin(resp.data);
 
@@ -298,6 +303,8 @@ const AddEditItemModal = (props) => {
                 className={formInputClassName("quantity")}
                 label="quantity"
                 label-placement="stacked"
+                step="1"
+                min="1"
                 value={itemState.quantity}
                 errorText="Only positive numbers allowed"
                 onIonBlur={() => inputFieldStateMap["quantity"][3](true)}

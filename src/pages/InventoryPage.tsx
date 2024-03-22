@@ -1,5 +1,5 @@
 import React from 'react';
-import { IonContent, IonHeader, IonTitle, IonToolbar, IonButton, useIonToast, IonButtons, IonIcon } from '@ionic/react';
+import { IonContent, IonHeader, IonTitle, IonToolbar, IonButton, useIonToast, IonButtons, IonIcon , useIonLoading} from '@ionic/react';
 import { search, personCircle, logOut, person } from 'ionicons/icons';
 import { logout, concatenateArraysAndJoin } from '../helper/APIRequest';
 
@@ -8,6 +8,8 @@ import './Home.css';
 const InventoryPage = (props) => {
   const [errorToast] = useIonToast();
   const [messageToast] = useIonToast();
+
+  
   return (<>
   <IonHeader>
     <IonToolbar>

@@ -1,8 +1,7 @@
 
 //import {  } from '../data/messages';
 import {
-  IonBackButton,
-  IonButtons,
+  useIonLoading,
   IonContent,
   IonHeader,
   IonIcon,
@@ -53,7 +52,6 @@ let validationMethodMap = {
 // Helper method - TODO: refactor later!
 
 function concatenateArraysAndJoin(obj: object) {
-
   let combinedArray: string[] = [];
   for (const key in obj) {
     if (obj.hasOwnProperty(key)) {
@@ -73,6 +71,9 @@ const Login = (props) => {
   // 0 -> sign in, 1 -> Create account
   const [loginType, setLoginType] = useState(0);
 
+
+
+  const [showLoading, hideLoading] = useIonLoading();
   const [errorToast] = useIonToast();
   const [messageToast] = useIonToast();
 
@@ -245,7 +246,7 @@ const Login = (props) => {
                   disabled={!(isUserNameValid && isEmailValid && isPasswordValid && isPhoneNumberValid)}
                   onClick={
                     // register button signup
-                    () => {
+                   async () => {
                       const usernameSplit = loginFormState.userName.split(' ');
                       const registerRequest = {
                         //full name string split here
@@ -257,6 +258,7 @@ const Login = (props) => {
                         "vc_code": "000000"
                       };
 
+                      await showLoading();
                       register(registerRequest).then((resp) => {
                         if (resp.response == "failed") {
                           const msg = concatenateArraysAndJoin(resp.data);
@@ -282,6 +284,8 @@ const Login = (props) => {
                           props.setToken(resp.token);
                         }
                       });
+
+                      await hideLoading();
 
 
 
@@ -347,12 +351,13 @@ const Login = (props) => {
                   expand="block"
                   className="signInButtonSpan"
                   disabled={!(isEmailValid && isPasswordValid)}
-                  onClick={() => {
+                  onClick={async () => {
                     const siginRequest = {
                       "username": loginFormState.email,
                       "password": loginFormState.password,
                     };
 
+                    await showLoading();
                     login(siginRequest).then((resp) => {
                       if (resp.response == "failed") {
 
@@ -381,6 +386,7 @@ const Login = (props) => {
                         //go to home page from here?
                       }
                     });
+                    await hideLoading();
 
 
 
