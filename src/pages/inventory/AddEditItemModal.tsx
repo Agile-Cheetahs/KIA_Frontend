@@ -12,23 +12,41 @@ import {
   IonPage,
   IonItem,
   IonInput,
+  useIonToast
 } from '@ionic/react';
 import { OverlayEventDetail } from '@ionic/core/components';
 import './AddEditItemModal.scss';
-import { validateQuantity, validateUnits, validateUsername, validateItemName, validateNumber, validateEmpty, validateLocationTab } from '../../helper/Validation';
+import { validateOptionalSelectText, validateUnits, validateDate, validateItemName, validateNumber, validateEmpty, validateLocationTab } from '../../helper/Validation';
+import { addEditItems, concatenateArraysAndJoin } from '../../helper/APIRequest';
 
 // COMMON CONSTANTS/ maps
 const ADD = "add";
 const EDIT = "edit";
 
+
+// partial application for validateDate, 
+// as there are multiple parameters and validate function assumes only one parameter.
+
+//moved it inside as whether action is edit or not is needed.
+const validateExpDateWrapper = (datestring: string, action = ADD) => {
+  return validateDate(datestring, action != EDIT, true);
+}
+
+
 let validationMethodMap = {
   "itemName": validateItemName,
   "quantity": validateNumber,
-  "units": validateEmpty,
-  "locationTab": validateEmpty,
-  "category": validateEmpty,
-  "expirationDate": validateEmpty
+  "units": validateUnits,
+  "locationTab": validateOptionalSelectText,
+  "category": validateOptionalSelectText,
+  "expirationDate": validateExpDateWrapper
 }
+
+let errorLabels = {
+  "expirationDate": "Date should be today or in future"
+}
+
+
 
 
 
@@ -38,10 +56,19 @@ const AddEditItemModal = (props) => {
   // For dropdown inputs -> props.locationtablist, props.categorylist, props.unittypes.
   // TODO - following should be in the parent page
   const modal = useRef<HTMLIonModalElement>(null);
-  const input = useRef<HTMLIonInputElement>(null);
-
+  //move this to parent page
+  const [errorToast] = useIonToast();
+  const [messageToast] = useIonToast();
+  
+  
+  
   const action = props.action;
   const editItem = action == EDIT ? props.editItem : '';
+
+
+
+
+
 
   // accept no selection also
   const locationTabList = [{ id: 1, name: "kitchen" },
@@ -57,9 +84,9 @@ const AddEditItemModal = (props) => {
   const [isItemNameValid, setIsItemNameValid] = useState<boolean>(false);
   const [isQuantityValid, setIsQuantityValid] = useState<boolean>(false);
   const [isUnitsValid, setIsUnitsValid] = useState<boolean>(false);
-  const [isLocationTabValid, setIsLocationTabValid] = useState<boolean>(false);
-  const [isCategoryValid, setIsCategoryValid] = useState<boolean>(false);
-  const [isExpirationDateValid, setIsExpirationDateValid] = useState<boolean>(false);
+  const [isLocationTabValid, setIsLocationTabValid] = useState<boolean>(true);
+  const [isCategoryValid, setIsCategoryValid] = useState<boolean>(true);
+  const [isExpirationDateValid, setIsExpirationDateValid] = useState<boolean>(true);
 
 
   const [isUserNameTouched, setIsUserNameTouched] = useState<boolean>(false);
@@ -125,7 +152,8 @@ const AddEditItemModal = (props) => {
 
     // if (value === '') return;
     // validate also includes checking for blank values
-    if (validateMethod(value)) {
+    console.log(action);
+    if (validateMethod(value, action)) {
       validateSetter(true);
 
     }
@@ -150,7 +178,45 @@ const AddEditItemModal = (props) => {
     // TODO: construct add/edit API method payload
     const addEditObject = { ...itemState, action: action };
 
-    modal.current?.dismiss();
+
+
+    const addEditRequest = {
+      //full name string split here
+      "name": addEditObject.itemName,
+      "quantity": addEditObject.quantity,
+      "unit": addEditObject.units,
+      "location": addEditObject.locationTab,
+      "category": addEditObject.category,
+      "expiration_date": addEditObject.expirationDate,
+      "id": action == ADD ? '' : '',
+      "token": props.token
+    };
+
+    addEditItems(addEditRequest, action == ADD).then((resp) => {
+      if (resp.response == "failed") {
+        const msg = concatenateArraysAndJoin(resp.data);
+
+        errorToast({
+          message: msg,
+          duration: 1500,
+          position: "top",
+          color: "warning"
+        });
+
+
+      } else if (resp.response == "successful") {
+
+        messageToast({
+          message: "User added item succesfully!",
+          duration: 1500,
+          position: "top",
+          color: "success"
+        });
+        modal.current?.dismiss();
+      }
+    });
+
+    
   }
 
   function onWillDismiss(ev: CustomEvent<OverlayEventDetail>) {
@@ -187,7 +253,12 @@ const AddEditItemModal = (props) => {
               </IonButtons>
               <IonTitle>{`${action == ADD ? "Add " : "Edit "} Inventory item`}</IonTitle>
               <IonButtons slot="end">
-                <IonButton strong={true} onClick={() => confirm()}>
+                <IonButton
+                  strong={true}
+                  disabled={!(isItemNameValid && isQuantityValid &&
+                    isUnitsValid && isLocationTabValid && isCategoryValid
+                    && isExpirationDateValid)}
+                  onClick={() => confirm()}>
                   Confirm
                 </IonButton>
               </IonButtons>
@@ -301,9 +372,9 @@ const AddEditItemModal = (props) => {
                 label-placement="stacked"
                 value={itemState.expirationDate}
                 helperText=""
-                //errorText={errorLabels["expirationDate"]}
+                errorText={errorLabels["expirationDate"]}
                 onIonBlur={() => inputFieldStateMap["expirationDate"][3](true)}
-                onIonInput={(event) => validate(event)}
+                onIonChange={(event) => { setItemState((state) => { return { ...itemState, expirationDate: state }; }); validate(event); }}
               ></IonInput>
             </IonItem>
           </IonContent>

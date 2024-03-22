@@ -55,6 +55,39 @@ export const validateItemName = (itemname: string) => {
 
 }
 
+export const validateUnits = (units: string) => {
+  return units.match(
+    /^[A-Za-z0-9]+$/
+  ) != undefined;
+
+}
+
+// For location tab, category select fields. optional
+export const validateOptionalSelectText = (units: string) => {
+  return units.match(
+    /^[A-Za-z0-9]*$/
+  ) != undefined;
+
+}
+
+//For Expiration date
+export const validateDate = (date: string, inFuture: boolean, isOptional: boolean ) => {
+  const currentDate = new Date();
+  const inputDate = new Date(date);
+  console.log(date);
+  if (!date) {
+    console.log(date);
+    return isOptional;
+  }
+  return inFuture ? inputDate >= currentDate : true;
+
+}
 
 
-//   export const validateEmail, validatePassword, validateUsername;
+
+// export const validateAddInventoryItem = () => {
+
+// }
+
+
+
