@@ -59,9 +59,9 @@ const AddEditItemModal = (props) => {
   //move this to parent page
   const [errorToast] = useIonToast();
   const [messageToast] = useIonToast();
-  
-  
-  
+
+
+
   const action = props.action;
   const editItem = action == EDIT ? props.editItem : '';
 
@@ -71,14 +71,21 @@ const AddEditItemModal = (props) => {
 
 
   // accept no selection also
-  const locationTabList = [{ id: 1, name: "kitchen" },
-  { id: 2, name: "freezer" }]// props.locationTabList;
-  const categoryList = [{ id: 1, name: "milk" },
-  { id: 2, name: "bananas" },
-  { id: 3, name: "cereal" }]//props.categoryList;
+  const locationTabList = 
+  [{ id: 1, name: "Kitchen" },
+  { id: 2, name: "Pantry" },
+  { id: 3, name: "Cabinet" }
+  ]// props.locationTabList;
+  const categoryList = [{ id: 1, name: "Fruit" },
+  { id: 2, name: "Grocery" }]
+  //props.categoryList;
   const unitTypes = [{ id: 1, name: "count" },
   { id: 2, name: "lb" },
-  { id: 3, name: "oz" }]
+  { id: 3, name: "t" },
+  { id: 4, name: "kg" },
+  { id: 5, name: "oz" },
+  { id: 6, name: "g" },
+  ]
   //props.unitTypes;
 
   const [isItemNameValid, setIsItemNameValid] = useState<boolean>(false);
@@ -216,7 +223,7 @@ const AddEditItemModal = (props) => {
       }
     });
 
-    
+
   }
 
   function onWillDismiss(ev: CustomEvent<OverlayEventDetail>) {
