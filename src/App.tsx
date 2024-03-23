@@ -1,9 +1,8 @@
 import { Redirect, Route } from 'react-router-dom';
 import { useState } from 'react';
-import { IonApp, IonRouterOutlet, setupIonicReact } from '@ionic/react';
+import { IonApp, IonRouterOutlet, setupIonicReact, useIonLoading } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
-import Home from './pages/Home';
-import Login from './pages/Login';
+
 
 
 
@@ -25,39 +24,46 @@ import '@ionic/react/css/display.css';
 
 /* Theme variables */
 import './theme/variables.css';
+
+/*pages*/
 import InventoryPage from './pages/InventoryPage';
 import KitchenPage from './pages/KitchenPage';
 import ShoppingPage from './pages/ShoppingPage';
+import AddEditItemModal from './pages/inventory/AddEditItemModal';
+import Login from './pages/Login';
 
 setupIonicReact();
 
 
-
 const App: React.FC = () => {
-    // User login management - 
-    const getToken = () => {
-      const tokenString : string | null = sessionStorage.getItem('token');
-      const userToken = JSON.parse(tokenString);
-      return userToken;
-    };
-    const [token, setToken] = useState(getToken());
-    const saveToken = (userToken) => {
-      sessionStorage.setItem('token', JSON.stringify(userToken));
-      setToken(userToken);
-    };
-   
-    if (!token) {
-      return <Login setToken={saveToken} />;
-    }
-   
-  
+
+  const [showLoading, hideLoading] = useIonLoading();
+
+
+  // User login management - move this to useToken.tsx?
+  const getToken = () => {
+    const tokenString: string | null = sessionStorage.getItem('token');
+    const userToken = JSON.parse(tokenString);
+    return userToken;
+  };
+  const [token, setToken] = useState(getToken());
+  const saveToken = (userToken) => {
+    sessionStorage.setItem('token', JSON.stringify(userToken));
+    setToken(userToken);
+  };
+
+  if (!token) {
+    return <Login setToken={saveToken} />;
+  }
+
+
   // const {token, setToken} = useToken();
   return (<IonApp>
     <IonReactRouter>
       <IonRouterOutlet>
-        
+
         <Route path="/" exact={true}>
-          <Redirect to="/kitchen" /> 
+          <Redirect to="/kitchen" />
         </Route>
         {/* TODO: remove /home? */}
         {/* <Route path="/home" exact={true} >
@@ -67,14 +73,18 @@ const App: React.FC = () => {
           <KitchenPage token={token} setToken={saveToken} />
         </Route>
         <Route path="/inventory" exact={true}>
-            <InventoryPage history={history} token={token}  setToken={saveToken}/>
+          <InventoryPage history={history} token={token} setToken={saveToken} />
         </Route>
         <Route path="/shopping" exact={true}>
-            <ShoppingPage setToken={saveToken}/>
-        </Route>        
-        {/* <Route path="/login">
-           <Login setToken={saveToken} />
-        </Route> */}
+          <ShoppingPage setToken={saveToken} />
+        </Route>
+        {/* TODO: hook following up to inventory main page item actions  */}
+        <Route path="/addinventory">
+          <AddEditItemModal token={token} setToken={saveToken} action={"add"} />
+        </Route>
+        <Route path="/editinventory">
+          <AddEditItemModal token={token} setToken={saveToken} action={"edit"} />
+        </Route>
       </IonRouterOutlet>
     </IonReactRouter>
   </IonApp>);

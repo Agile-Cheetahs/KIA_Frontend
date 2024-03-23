@@ -1,5 +1,5 @@
 import React from 'react';
-import { IonContent, IonHeader, IonTitle, IonToolbar, IonButton, useIonToast, IonButtons, IonIcon,
+import { IonContent, IonHeader, IonTitle, IonToolbar, IonButton, useIonToast, IonButtons, IonIcon,  useIonLoading
   IonLabel, IonRouterOutlet, IonList, IonItem,IonTabs, IonTab, IonTabBar, IonTabButton } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
 import { Route, Redirect } from 'react-router';
@@ -85,6 +85,7 @@ const InventoryPage = (props:any) => {
                 message: msg,
                 duration: 1500,
                 position: "top",
+                color: "warning"
               });
 
 
@@ -95,12 +96,13 @@ const InventoryPage = (props:any) => {
                 message: msg,
                 duration: 1500,
                 position: "top",
+                color: "success"
               });
               // set the login token here.
               props.setToken('');
+              props.history.push('/');
             }
-            //props.history.push('/login');
-
+            
           });
           
         }} >

@@ -1,8 +1,7 @@
 
 //import {  } from '../data/messages';
 import {
-  IonBackButton,
-  IonButtons,
+  useIonLoading,
   IonContent,
   IonHeader,
   IonIcon,
@@ -21,7 +20,7 @@ import {
 import { logInOutline } from 'ionicons/icons';
 import { Redirect, useParams } from 'react-router';
 import { useState, useRef } from 'react';
-import './Login.css';
+import './Login.scss';
 import { validateEmail, validatePassword, validateUsername, validateEmpty, validatePhoneNumber } from '../helper/Validation';
 import { register, login } from '../helper/APIRequest';
 
@@ -53,21 +52,14 @@ let validationMethodMap = {
 // Helper method - TODO: refactor later!
 
 function concatenateArraysAndJoin(obj: object) {
-
   let combinedArray: string[] = [];
-
-
   for (const key in obj) {
-
     if (obj.hasOwnProperty(key)) {
-
       if (Array.isArray(obj[key])) {
-
         combinedArray = combinedArray.concat(obj[key]);
       }
     }
   }
-
   // Join the elements of the combinedArray into a string, separated by commas
   const resultString = combinedArray.join(',');
 
@@ -75,17 +67,15 @@ function concatenateArraysAndJoin(obj: object) {
   return resultString;
 }
 
-
-
-
 const Login = (props) => {
   // 0 -> sign in, 1 -> Create account
   const [loginType, setLoginType] = useState(0);
 
+
+
+  const [showLoading, hideLoading] = useIonLoading();
   const [errorToast] = useIonToast();
   const [messageToast] = useIonToast();
-
-
 
   //const [isValid, setIsValid] = useState<boolean>(true);
 
@@ -122,15 +112,6 @@ const Login = (props) => {
     "Password": "password",
     "PhoneNumber": "userPhone"
   }
-
-  // const isFormValid = () => {
-  //   if (isUserNameValid && isEmailValid && isPasswordValid) {
-  //     setIsValid(true);
-  //   } else {
-  //     setIsValid(false);
-  //   }
-  // }
-
   const formInputClassName = (fieldName: string) => {
     const validateField = inputFieldStateMap[fieldName][0];
     return `${validateField && 'ion-valid'} ${validateField === false && 'ion-invalid'} ${inputFieldStateMap[fieldName][2] && 'ion-touched'}`
@@ -200,7 +181,7 @@ const Login = (props) => {
                     type="text"
                     className={formInputClassName("Username")}
                     label="Username"
-                    maxlength={40}
+                    maxlength={60}
                     label-placement="stacked"
                     placeholder="First Name Last Name"
                     value={loginFormState.userName}
@@ -215,10 +196,11 @@ const Login = (props) => {
                     type="email"
                     className={formInputClassName("Email")}
                     label="Email"
+                    maxlength={60}
                     label-placement="stacked"
                     placeholder="email@domain.com"
                     value={loginFormState.email}
-                    errorText="Email ID should not have invalid characters"
+                    errorText="Email ID should be in email@domain.com format"
                     onIonBlur={() => inputFieldStateMap["Email"][3](true)}
                     //onIonChange={(event) => validate(event)}
                     onIonInput={(event) => validate(event)}
@@ -230,6 +212,7 @@ const Login = (props) => {
                     type="tel"
                     className={formInputClassName("PhoneNumber")}
                     label="PhoneNumber"
+                    maxlength={13}
                     label-placement="stacked"
                     placeholder="(000)-000-0000"
                     value={loginFormState.userPhone}
@@ -245,7 +228,7 @@ const Login = (props) => {
                     type="password"
                     className={formInputClassName("Password")}
                     label="Password"
-                    maxlength={30}
+                    maxlength={20}
                     clearOnEdit={false}
                     label-placement="stacked" placeholder="Enter a password"
                     value={loginFormState.password}
@@ -263,7 +246,7 @@ const Login = (props) => {
                   disabled={!(isUserNameValid && isEmailValid && isPasswordValid && isPhoneNumberValid)}
                   onClick={
                     // register button signup
-                    () => {
+                   async () => {
                       const usernameSplit = loginFormState.userName.split(' ');
                       const registerRequest = {
                         //full name string split here
@@ -275,17 +258,19 @@ const Login = (props) => {
                         "vc_code": "000000"
                       };
 
+                      await showLoading();
                       register(registerRequest).then((resp) => {
                         if (resp.response == "failed") {
                           const msg = concatenateArraysAndJoin(resp.data);
 
-                        errorToast({
-                          message: msg,
-                          duration: 1500,
-                          position: "top",
-                        });
+                          errorToast({
+                            message: msg,
+                            duration: 1500,
+                            position: "top",
+                            color: "warning"
+                          });
 
-                          
+
                         } else if (resp.response == "successful") {
                           const msg = "User registered succesfully!";
 
@@ -293,11 +278,14 @@ const Login = (props) => {
                             message: msg,
                             duration: 1500,
                             position: "top",
+                            color: "success"
                           });
                           // set the login token here.
                           props.setToken(resp.token);
                         }
                       });
+
+                      await hideLoading();
 
 
 
@@ -327,10 +315,11 @@ const Login = (props) => {
 
               <IonCardContent>
                 <IonItem >
-                <IonInput
+                  <IonInput
                     type="email"
                     className={formInputClassName("Email")}
                     label="Email"
+                    maxlength={60}
                     label-placement="stacked"
                     placeholder="email@domain.com"
                     value={loginFormState.email}
@@ -362,12 +351,13 @@ const Login = (props) => {
                   expand="block"
                   className="signInButtonSpan"
                   disabled={!(isEmailValid && isPasswordValid)}
-                  onClick={() => {
+                  onClick={async () => {
                     const siginRequest = {
                       "username": loginFormState.email,
                       "password": loginFormState.password,
                     };
 
+                    await showLoading();
                     login(siginRequest).then((resp) => {
                       if (resp.response == "failed") {
 
@@ -379,6 +369,7 @@ const Login = (props) => {
                           message: msg,
                           duration: 1500,
                           position: "top",
+                          color: "warning"
                         });
 
                       } else if (resp.response == "successful") {
@@ -388,12 +379,14 @@ const Login = (props) => {
                           message: msg,
                           duration: 1500,
                           position: "top",
+                          color: "success"
                         });
                         // set the login token here.
                         props.setToken(resp.token);
                         //go to home page from here?
                       }
                     });
+                    await hideLoading();
 
 
 
