@@ -1,0 +1,13 @@
+{
+    "items": [
+        {
+            "id": 1,
+            "itemName": "bananas",
+            "quantity": 2,
+            "units": "lb",
+            "locationTab": "pantry",
+            "category": "Grocery",
+            "expirationDate": ""
+        }
+    ]
+}
