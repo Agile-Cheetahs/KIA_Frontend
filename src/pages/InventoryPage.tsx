@@ -1,14 +1,15 @@
 import React from 'react';
-import { IonContent, IonHeader, IonTitle, IonToolbar, IonButton, useIonToast, IonButtons, IonIcon , useIonLoading} from '@ionic/react';
+import { IonContent, IonHeader, IonTitle, IonToolbar, IonButton, useIonToast, IonButtons, IonIcon , useIonLoading, useIonModal} from '@ionic/react';
 import { search, personCircle, logOut, person } from 'ionicons/icons';
 import { logout, concatenateArraysAndJoin } from '../helper/APIRequest';
+
+// import {AddEditItemModal} from  './inventory/AddEditItemModal';
 
 import './Home.css';
 
 const InventoryPage = (props) => {
   const [errorToast] = useIonToast();
   const [messageToast] = useIonToast();
-
   
   return (<>
   <IonHeader>

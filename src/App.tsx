@@ -56,6 +56,16 @@ const App: React.FC = () => {
     return <Login setToken={saveToken} />;
   }
 
+  const item = {
+    "id": 1,
+    "itemName": "bananas",
+    "quantity": 2,
+    "units": "lb",
+    "locationTab": "pantry",
+    "category": "Grocery",
+    "expirationDate": ""
+  };
+
 
   // const {token, setToken} = useToken();
   return (<IonApp>
@@ -83,7 +93,7 @@ const App: React.FC = () => {
           <AddEditItemModal token={token} setToken={saveToken} action={"add"} />
         </Route>
         <Route path="/editinventory">
-          <AddEditItemModal token={token} setToken={saveToken} action={"edit"} />
+          <AddEditItemModal editItem={item} token={token} setToken={saveToken} action={"edit"} />
         </Route>
       </IonRouterOutlet>
     </IonReactRouter>

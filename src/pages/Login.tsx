@@ -319,6 +319,7 @@ const Login = (props) => {
                     type="email"
                     className={formInputClassName("Email")}
                     label="Email"
+                    data-testid="login-email"
                     maxlength={60}
                     label-placement="stacked"
                     placeholder="email@domain.com"
@@ -335,6 +336,7 @@ const Login = (props) => {
                     type="password"
                     className={formInputClassName("Password")}
                     label="Password"
+                    data-testid="login-password"
                     maxlength={20}
                     clearOnEdit={false}
                     label-placement="stacked"
@@ -350,6 +352,7 @@ const Login = (props) => {
                 <IonButton
                   expand="block"
                   className="signInButtonSpan"
+                  data-testid="signin-button"
                   disabled={!(isEmailValid && isPasswordValid)}
                   onClick={async () => {
                     const siginRequest = {

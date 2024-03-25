@@ -45,7 +45,7 @@ export const validatePhoneNumber = (phonenumber: string) => {
 // Add/Edit inventory form validation
 export const validateNumber = (quantity: string) => {
   const num = parseInt(quantity, 10);
-  return num >= 0 && quantity.match(/^[0-9]+$/) != null;
+  return num > 0 && quantity.match(/^[0-9]+$/) != null;
 }
 
 export const validateItemName = (itemname: string) => {

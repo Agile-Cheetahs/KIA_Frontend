@@ -87,14 +87,16 @@ const AddEditItemModal = (props) => {
   ]
   //props.unitTypes;
 
-  const [isItemNameValid, setIsItemNameValid] = useState<boolean>(false);
-  const [isQuantityValid, setIsQuantityValid] = useState<boolean>(false);
-  const [isUnitsValid, setIsUnitsValid] = useState<boolean>(false);
+  // precondition: the edited item is valid
+  const [isItemNameValid, setIsItemNameValid] = useState<boolean>(action == EDIT);
+  const [isQuantityValid, setIsQuantityValid] = useState<boolean>(action == EDIT);
+  // below 3 fields will always have 1 value selected. date is optional, hence default validation is true.
+  const [isUnitsValid, setIsUnitsValid] = useState<boolean>(true);
   const [isLocationTabValid, setIsLocationTabValid] = useState<boolean>(true);
   const [isCategoryValid, setIsCategoryValid] = useState<boolean>(true);
   const [isExpirationDateValid, setIsExpirationDateValid] = useState<boolean>(true);
 
-
+ 
   const [isUserNameTouched, setIsUserNameTouched] = useState<boolean>(false);
   const [isQuantityTouched, setIsQuantityTouched] = useState<boolean>(false);
   const [isUnitsTouched, setIsUnitsTouched] = useState<boolean>(false);
@@ -103,12 +105,12 @@ const AddEditItemModal = (props) => {
   const [isExpirationDateTouched, setExpirationDateTouched] = useState<boolean>(false);
 
   const emptyItemState = {
-    "itemName": action == EDIT ? "" : "", // TODO: edit item payload used to populate these values
-    "quantity": action == EDIT ? "" : "",
-    "units": action == EDIT ? "" : "",
-    "locationTab": action == EDIT ? "" : "",
-    "category": action == EDIT ? "" : "",
-    "expirationDate": action == EDIT ? "" : ""
+    "itemName": action == EDIT ? editItem.itemName : "", // TODO: edit item payload used to populate these values
+    "quantity": action == EDIT ? editItem.quantity : "",
+    "units": action == EDIT ? editItem.units : "count" ,
+    "locationTab": action == EDIT ? editItem.locationTab : "Pantry",
+    "category": action == EDIT ? editItem.category : "Grocery",
+    "expirationDate": action == EDIT ?  editItem.expirationDate : ""
   };
   const [itemState, setItemState] = useState(emptyItemState);
 
@@ -116,6 +118,7 @@ const AddEditItemModal = (props) => {
   // INput specific maps with each field - makes it easy for generic methods to set these
   // is it neede
   let inputFieldStateMap = {
+    //            0, `1, 2, 3
     "itemName": [isItemNameValid, setIsItemNameValid, isUserNameTouched, setIsUserNameTouched],
     "quantity": [isQuantityValid, setIsQuantityValid, isQuantityTouched, setIsQuantityTouched],
     "units": [isUnitsValid, setIsUnitsValid, isUnitsTouched, setIsUnitsTouched],
@@ -197,7 +200,7 @@ const AddEditItemModal = (props) => {
 
     if (action == EDIT) {
       // TODO: add string to the end
-      addEditRequest.id = "";
+      addEditRequest.id = editItem.id;
     }
 
     if (addEditObject.expirationDate) {
@@ -219,7 +222,7 @@ const AddEditItemModal = (props) => {
       } else if (resp.response == "successful") {
 
         messageToast({
-          message: "User added item succesfully!",
+          message: `User ${action == EDIT ? "edited" :"added"} item succesfully!`,
           duration: 1500,
           position: "top",
           color: "success"
