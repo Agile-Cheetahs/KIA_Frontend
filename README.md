@@ -4,14 +4,14 @@
 - Communicates with the API written in Django.
 
 # Features
-- Currently building the home page with a tab list (kitchen, shopping etc)
-- Login/ Signup flow.
+- Kitchen Inventory page
+- Shopping list
 
 
 
 
 # TODO
-- Complete the signout flow and integration with home page.
+- Start with shopping list main page. 
 
 
 # Setup
@@ -19,3 +19,8 @@
 - The `KIA_Backend` project also needs to be set up to interface with the API.
 - By default this project talks to the API server on `http://localhost:8000/'. 
    -To change it go to the `vite.config.ts` config file and change the port number.
+
+# Testing
+- cypress tests can be run with
+`cypress run test`
+
