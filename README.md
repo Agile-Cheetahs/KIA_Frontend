@@ -24,3 +24,6 @@
 - cypress tests can be run with
 `cypress run test`
 
+
+# API communication
+- `https://danibazi9.pythonanywhere.com/` is the API endpoint of the Django server. For development this endpoint is the hostname for the proxy to connect to.

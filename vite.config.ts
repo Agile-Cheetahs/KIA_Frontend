@@ -17,7 +17,8 @@ export default defineConfig({
     port: 3000,
     proxy: {
       '/api': {
-        target: 'http://localhost:8000/'
+        target: 'https://danibazi9.pythonanywhere.com/',
+        changeOrigin: true
       }
     }
   }
