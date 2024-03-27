@@ -51,22 +51,22 @@ export const validateNumber = (quantity: string) => {
 export const validateItemName = (itemname: string) => {
   return itemname.match(
     /^[A-Za-z0-9 _]{1,40}$/
-  ) != undefined;
+  ) != null;
 
 }
 
 export const validateUnits = (units: string) => {
   return units.match(
     /^[A-Za-z0-9]+$/
-  ) != undefined;
+  ) != null;
 
 }
 
 // For location tab, category select fields. optional
 export const validateOptionalSelectText = (units: string) => {
   return units.match(
-    /^[A-Za-z0-9]*$/
-  ) != undefined;
+    /^[A-Za-z0-9]+$/
+  ) != null;
 
 }
 
