@@ -63,7 +63,7 @@ const AddEditItemModal = (props) => {
 
   const action = props.action;
   const editItem = action == EDIT ? props.editItem : '';
-
+  const listItems = props.listItems;
 
 
 
@@ -224,6 +224,10 @@ const AddEditItemModal = (props) => {
           position: "top",
           color: "success"
         });
+        listItems.push( {category:"Cereal",
+        itemName:"Trix",
+        quantity:1,
+        units:"Count"});
         modal.current?.dismiss();
       }
     });
@@ -242,17 +246,6 @@ const AddEditItemModal = (props) => {
   // }
 
   return (
-    <IonPage>
-      <IonHeader>
-        <IonToolbar>
-          <IonTitle>{`${action == ADD ? "Add " : "Edit "} Inventory item`}</IonTitle>
-        </IonToolbar>
-      </IonHeader>
-      <IonContent className="ion-padding">
-        <IonButton id="open-modal" expand="block">
-          Open
-        </IonButton>
-
         <IonModal ref={modal} trigger="open-modal" onWillDismiss={(ev) => onWillDismiss(ev)}>
           <IonHeader>
             <IonToolbar>
@@ -393,8 +386,7 @@ const AddEditItemModal = (props) => {
             </IonItem>
           </IonContent>
         </IonModal>
-      </IonContent >
-    </IonPage >
+   
   );
 }
 

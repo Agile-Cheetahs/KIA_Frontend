@@ -1,5 +1,5 @@
 import React from 'react';
-import { IonContent, IonHeader, IonTitle, IonToolbar, IonButton, useIonToast, IonButtons, IonIcon,  useIonLoading
+import { IonContent, IonHeader, IonTitle, IonToolbar, IonButton, useIonToast, IonButtons, IonIcon,  useIonLoading,
   IonLabel, IonRouterOutlet, IonList, IonItem,IonTabs, IonTab, IonTabBar, IonTabButton } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
 import { Route, Redirect } from 'react-router';
@@ -9,6 +9,7 @@ import { logout, concatenateArraysAndJoin } from '../helper/APIRequest';
 import './Home.css';
 import AddInventoryItemPage from './AddInventoryItemPage';
 import {addCircle} from 'ionicons/icons';
+import AddEditItemModal from './inventory/AddEditItemModal';
 
 let inventoryListItems = [
   {category:"Cereal",
@@ -60,6 +61,11 @@ function Inventory()
             units={item.units}/>)}
           </IonList>
     );
+  
+}
+
+function handleAddItemToList()
+{
   
 }
 
@@ -119,7 +125,7 @@ const InventoryPage = (props:any) => {
   </IonHeader>
   <IonContent>
   <IonReactRouter>
-        <IonTabs>
+        {/*<IonTabs>
           <IonRouterOutlet>              
                 <Route path="/pantry" render={()=> <InventoryPage />} exact={true}/>              
                 <Route path="/fridge" render={()=> <InventoryPage />} exact={true}/>  
@@ -131,15 +137,16 @@ const InventoryPage = (props:any) => {
             <IonTabButton tab="fridge" href='/fridge'>          
                 <IonLabel> Fridge </IonLabel>
             </IonTabButton>
-          </IonTabBar>
-        </IonTabs>      
+        </IonTabBar>
+        </IonTabs>  */}    
       </IonReactRouter>
     <Inventory/>
-     <div>
-      <IonButton href='addInventoryItem' slot="icon-only">
+    
+    <IonButton id="open-modal">
       <IonIcon icon={addCircle} />      
-      </IonButton>
-      </div>
+    </IonButton>
+    <AddEditItemModal action="add" listItems={inventoryListItems} token={props.token}/>
+    
   </IonContent>
 </>);
 };
