@@ -45,28 +45,28 @@ export const validatePhoneNumber = (phonenumber: string) => {
 // Add/Edit inventory form validation
 export const validateNumber = (quantity: string) => {
   const num = parseInt(quantity, 10);
-  return num >= 0 && quantity.match(/^[0-9]+$/) != null;
+  return num > 0 && quantity.match(/^[0-9]+$/) != null;
 }
 
 export const validateItemName = (itemname: string) => {
   return itemname.match(
     /^[A-Za-z0-9 _]{1,40}$/
-  ) != undefined;
+  ) != null;
 
 }
 
 export const validateUnits = (units: string) => {
   return units.match(
     /^[A-Za-z0-9]+$/
-  ) != undefined;
+  ) != null;
 
 }
 
 // For location tab, category select fields. optional
 export const validateOptionalSelectText = (units: string) => {
   return units.match(
-    /^[A-Za-z0-9]*$/
-  ) != undefined;
+    /^[A-Za-z0-9]+$/
+  ) != null;
 
 }
 

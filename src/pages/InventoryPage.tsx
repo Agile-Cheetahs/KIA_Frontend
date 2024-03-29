@@ -6,6 +6,8 @@ import { Route, Redirect } from 'react-router';
 import { search, personCircle, logOut, person } from 'ionicons/icons';
 import { logout, concatenateArraysAndJoin } from '../helper/APIRequest';
 
+// import {AddEditItemModal} from  './inventory/AddEditItemModal';
+
 import './Home.css';
 import AddInventoryItemPage from './AddInventoryItemPage';
 import {addCircle} from 'ionicons/icons';
