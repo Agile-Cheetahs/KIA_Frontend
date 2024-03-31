@@ -1,9 +1,13 @@
 import legacy from '@vitejs/plugin-legacy'
 import react from '@vitejs/plugin-react'
-import { defineConfig } from 'vite'
+import { defineConfig, loadEnv } from 'vite'
 
 // https://vitejs.dev/config/
-export default defineConfig({
+export default defineConfig(({mode}) => {
+
+  const env = loadEnv(mode, process.cwd());
+  const BASE_API_URL = env.VITE_BASE_API_URL;
+  return {
   plugins: [
     react(),
     legacy()
@@ -17,9 +21,11 @@ export default defineConfig({
     port: 3000,
     proxy: {
       '/api': {
-        target: 'https://danibazi9.pythonanywhere.com/',
+        target: BASE_API_URL,
         changeOrigin: true
       }
     }
   }
-})
+};
+});
+
