@@ -1,5 +1,6 @@
+import { Capacitor } from "@capacitor/core";
 
-
+const BASE_API_URL = Capacitor.getPlatform() === "android" ? import.meta.env.VITE_BASE_API_URL : '';
 
 /* 
 Helper functions for performing API calls to backend server
@@ -11,10 +12,11 @@ export async function register(requestObject: Object) {
     let response;
     try {
 
-        const endpoint = '/api/account/signup';
+        const endpoint =   '/api/account/signup';
 
-
-         response = await fetch(endpoint, {
+        //(Capacitor.getPlatform() === "android" ? 'https://danibazi9.pythonanywhere.com/api/account/login'
+        
+         response = await fetch(BASE_API_URL + endpoint, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -43,14 +45,13 @@ export async function register(requestObject: Object) {
 }
 
 export async function login(requestObject: Object) {
-    
     let response;
     try {
 
-        const endpoint = '/api/account/login';
+        const endpoint =  '/api/account/login';
 
-
-         response = await fetch(endpoint, {
+        //(Capacitor.getPlatform() === "android" ? 'https://danibazi9.pythonanywhere.com/api/account/login'
+         response = await fetch(BASE_API_URL + endpoint, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -93,7 +94,7 @@ export async function logout(requestObject: Object) {
         const endpoint = '/api/account/logout';
 
 
-         response = await fetch(endpoint, {
+         response = await fetch(BASE_API_URL + endpoint, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -133,7 +134,7 @@ export async function addEditItems(requestObject: Object,token: String, isAdd: b
         const endpoint = '/api/inventory/items/';
 
 
-         response = await fetch(endpoint, {
+         response = await fetch(BASE_API_URL + endpoint, {
             method: isAdd ? 'POST' : 'PUT',
             headers: {
                 'Content-Type': 'application/json',
