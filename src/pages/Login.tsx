@@ -171,7 +171,7 @@ const Login = (props) => {
         </IonToolbar>
       </IonHeader>
 
-      <IonContent color="light">
+      <IonContent color="light" >
         <IonList inset={false}>
           {loginType ?
             <IonCard className='registerCard'>
