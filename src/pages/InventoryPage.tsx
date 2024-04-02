@@ -1,15 +1,14 @@
 import React from 'react';
 import { IonContent, IonHeader, IonTitle, IonToolbar, IonButton, useIonToast, IonButtons, IonIcon,  useIonLoading,
-  IonLabel, IonRouterOutlet, IonList, IonItem,IonTabs, IonTab, IonTabBar, IonTabButton } from '@ionic/react';
+  IonLabel, IonRouterOutlet, IonList, IonItem,IonTabs, IonTab, IonTabBar, IonTabButton, useIonModal } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
 import { Route, Redirect } from 'react-router';
 import { search, personCircle, logOut, person } from 'ionicons/icons';
 import { getInventory,logout, concatenateArraysAndJoin } from '../helper/APIRequest';
 import {useState} from 'react';
 
-// import {AddEditItemModal} from  './inventory/AddEditItemModal';
 
-import './Home.css';
+import './InventoryPage.css';
 import AddInventoryItemPage from './AddInventoryItemPage';
 import {addCircle, trash, createOutline} from 'ionicons/icons';
 import AddEditItemModal from './inventory/AddEditItemModal';
@@ -28,12 +27,12 @@ let inventoryListItems = [
   {category:"Cereal",
   name:"Lucky Charms",
   quantity:1,
-  unit:"Count",
+  unit:"count",
   location: "Pantry"},
   {category:"Fruit",
   name:"Apple",
   quantity:1,
-  unit:"Count",
+  unit:"count",
   location: "Fridge"},
   {category:"Ice",
   name:"Ice",
@@ -43,7 +42,7 @@ let inventoryListItems = [
   {category:"Water",
   name:"Irish Spring Gallon Water",
   quantity:1,
-  unit:"Gallon",
+  unit:"g",
   location: "Fridge"}
 ]
 
@@ -73,8 +72,10 @@ function InventoryItemView(props:any){
             )}}>
               <IonIcon icon={trash}/>
             </IonButton>
-            <AddEditItemModal modalTriggerID={"listItemID" + props.listIndex} action="edit" listItems={inventoryListItems} token={props.token}
-            editItem={{itemName:props.name, quantity:props.quantity}}/>
+         
+            <AddEditItemModal modalTriggerID={"listItemID" + props.listIndex} action="edit" editItem={inventoryListItems[props.listIndex]} token={props.token}
+            />
+            {/* listItems={{itemName:props.name, quantity:props.quantity}} */}
           </IonItem>;
 }
 
@@ -107,7 +108,16 @@ function Inventory(props:any)
             listIndex = {index}
             inventoryItems = {filteredItems}
             setInventoryItem = {filteredItems}/>)}
+          <IonItem className={"add-item-row"}>
+          <IonButton size="default" expand={"block"} id={"AddInventoryItem"}>
+            <IonIcon slot="icon-only" icon={addCircle}></IonIcon>
+          </IonButton> 
+          <AddEditItemModal modalTriggerID={"AddInventoryItem"} action="add" token={props.token}
+            />
+          </IonItem>
           </IonList>
+           
+
     );
   
 }
@@ -135,12 +145,13 @@ function removeItemFromList(index:number)
 const InventoryPage = (props:any) => {
   const [errorToast] = useIonToast();
   const [messageToast] = useIonToast();
+
+  // FOr add Item Modal
+  const [isModalOpen, setIsModalOpen] = useState(false);
   
   return (<>
   <IonHeader>
-    <IonRouterOutlet>
-      <Route path="/addInventoryItem" render={()=> <AddInventoryItemPage />} exact={true}/>
-    </IonRouterOutlet>
+
     <IonToolbar>
       <IonTitle>Inventory</IonTitle>
       <IonButtons slot="primary">
@@ -182,9 +193,9 @@ const InventoryPage = (props:any) => {
             <IonIcon slot="icon-only" icon={person}></IonIcon>
           </IonButton> */}
       </IonButtons>
-       <IonButton>
+       {/* <IonButton>
           <IonIcon icon={createOutline}/>
-        </IonButton>  
+        </IonButton>   */}
     </IonToolbar>
     
   </IonHeader>
@@ -211,10 +222,10 @@ const InventoryPage = (props:any) => {
       </IonReactRouter>
     {/*<Inventory token={props.token}/> */}
  
-    <IonButton id="open-modal">
+    {/* <IonButton id="open-modal">
       <IonIcon icon={addCircle} />      
     </IonButton>
-    <AddEditItemModal modalTriggerID="open-modal" action="add" listItems={inventoryListItems} token={props.token}/>
+     */}
     
   </IonContent>
 </>);
