@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   IonButtons,
   IonButton,
@@ -119,6 +119,15 @@ const AddEditItemModal = (props) => {
   };
   const [itemState, setItemState] = useState(emptyItemState);
 
+  useEffect(() => {
+    // when modal is opened after mounting, update state after validation
+        setIsItemNameValid(action == EDIT);
+        setIsQuantityValid(action == EDIT);
+    
+  }, 
+  [props.action]
+  );
+
 
   // INput specific maps with each field - makes it easy for generic methods to set these
   // is it neede
@@ -176,13 +185,14 @@ const AddEditItemModal = (props) => {
 
   };
 
+    
 
 
   const clearForms = () => {
 
     //clear form input
     Object.values(inputFieldStateMap).forEach(validator => {
-      validator[1]('');
+      validator[1](true);
     });
     setItemState(emptyItemState);
   }
@@ -205,7 +215,7 @@ const AddEditItemModal = (props) => {
 
     if (action == EDIT) {
       // TODO: add string to the end
-      //addEditRequest.id = editItem.id;
+      addEditRequest.id = editItem.id;
     }
 
     if (addEditObject.expirationDate) {
@@ -232,7 +242,7 @@ const AddEditItemModal = (props) => {
           position: "top",
           color: "success"
         });
-        addItemToList(addEditRequest)
+        props.actionConfirm(action, addEditRequest);
 
       }
     });
@@ -242,6 +252,7 @@ const AddEditItemModal = (props) => {
 
   function onWillDismiss(ev: CustomEvent<OverlayEventDetail>) {
     if (ev.detail.role === 'confirm') {
+     // ('', itemState);
     }
   }
 

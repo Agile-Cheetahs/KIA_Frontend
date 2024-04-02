@@ -1,6 +1,6 @@
 import React from 'react';
 import { IonContent, IonHeader, IonTitle, IonToolbar, IonButton, useIonToast, IonButtons, IonIcon,  useIonLoading,
-  IonLabel, IonRouterOutlet, IonList, IonItem,IonTabs, IonTab, IonTabBar, IonTabButton, useIonModal } from '@ionic/react';
+  IonLabel, IonRouterOutlet, IonList, IonItem,IonTabs, IonTab,IonPage, IonListHeader,  IonTabBar, IonTabButton, useIonModal } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
 import { Route, Redirect } from 'react-router';
 import { search, personCircle, logOut, person } from 'ionicons/icons';
@@ -25,35 +25,42 @@ export interface InventoryItemModel{
 
 let inventoryListItems = [
   {
-    id: 1,
-    category:"Cereal",
+    id: 17,
+    category:"Grocery",
   name:"Lucky Charms",
   quantity:1,
   unit:"count",
   location: "Pantry"},
-  { id: 2,
+  {
+    id: 13,
+    category:"Grocery",
+  name:"sugar",
+  quantity:1,
+  unit:"kg",
+  location: "Pantry"},
+  { id: 18,
     category:"Fruit",
   name:"Apple",
   quantity:1,
   unit:"count",
-  location: "Fridge"},
+  location: "Cabinet"},
   {
-    id: 3,
-    category:"Ice",
+    id: 15,
+    category:"Grocery",
   name:"Ice",
   quantity:1,
   unit:"lb",
-  location: "Fridge"},
+  location: "Cabinet"},
   {
-    id: 4,
-    category:"Water",
+    id: 16,
+    category:"Grocery",
   name:"Irish Spring Gallon Water",
   quantity:1,
   unit:"g",
-  location: "Fridge"}
+  location: "Cabinet"}
 ]
 
-let kitchenTabs = ["Kitchen", "Fridge", "Pantry" ];
+let kitchenTabs = ["Kitchen", "Cabinet", "Pantry" ];
 
 function InventoryItemView(props:any){
   return  <IonItem>
@@ -69,7 +76,10 @@ function InventoryItemView(props:any){
             <IonLabel>
               {props.unit}
             </IonLabel>
-            <IonButton id={"edit-item-" + props.id} className="">
+            <IonButton id={"edit-item-" + props.id} className="edit-item" onClick={() => {
+
+              //temporary
+            }}>
               <IonIcon icon={createOutline}/>
             </IonButton>                   
             <IonButton onClick={()=>{props.setInventoryItems(props.inventoryItems.filter(
@@ -80,7 +90,7 @@ function InventoryItemView(props:any){
               <IonIcon icon={trash}/>
             </IonButton>
          
-            <AddEditItemModal modalTriggerID={"edit-item-" + props.id} action="edit" editItem={props.item} token={props.token}
+            <AddEditItemModal modalTriggerID={"edit-item-" + props.id} action="edit" actionConfirm={props.actionConfirm} editItem={props.item} token={props.token}
             />
             {/* listItems={{itemName:props.name, quantity:props.quantity}} */}
           </IonItem>;
@@ -101,13 +111,51 @@ function Inventory(props:any)
       modal.current?.dismiss();*/
     }
   });
- 
+  const addItemToList = (action: string, item: InventoryItemModel) => {
+    if (action == "add") {
+
+      props.setInventoryItems((lst) => {
+        return [...lst,
+          item];
+      })
+    } else {
+
+      props.setInventoryItems((lst) => {
+        return lst.map(obj => item.id === obj.id ? item : obj);
+      }
+
+      )
+    }
+
+    // }).filter(
+    //   (a:any)=>a.name !== props.itemName
+    // )
+  };
+
   let filteredItems = props.inventoryItems.filter((item) => item.location === props.location);
     return(
-      //{this.state.inventoryListItems.map((itemName, category, quantity,))}       
+      //{this.state.inventoryListItems.map((itemName, category, quantity,))}
+      // <IonPage>    
+      //    <IonContent>  
           <IonList>
-          {filteredItems.map((item, index) => 
-          <InventoryItemView key={item.id} 
+            <IonListHeader className={"inventory-item-headers"}>
+            <IonLabel>
+            <b>Category</b>
+            </IonLabel>
+            <IonLabel>
+            <b>Name</b>
+            </IonLabel>
+            <IonLabel>
+            <b>Quantity</b>
+            </IonLabel>
+            <IonLabel>
+            <b>Units</b>
+            </IonLabel>
+          </IonListHeader>
+          {filteredItems.map((item) => 
+          <InventoryItemView 
+            key={item.id} 
+            token={props.token}
             category={item.category}
             itemName={item.name}
             quantity={item.quantity}
@@ -115,28 +163,20 @@ function Inventory(props:any)
             id={item.id}
             item={item}
             inventoryItems = {props.inventoryItems}
+            actionConfirm={addItemToList}
             setInventoryItems = {props.setInventoryItems}/>)}
           <IonItem className={"add-item-row"}>
           <IonButton size="default" expand={"block"} id={"AddInventoryItem"}>
             <IonIcon slot="icon-only" icon={addCircle}></IonIcon>
           </IonButton> 
-          <AddEditItemModal modalTriggerID={"AddInventoryItem"} action="add" token={props.token}
+          <AddEditItemModal modalTriggerID={"AddInventoryItem"} actionConfirm={addItemToList} action="add" token={props.token}
             />
           </IonItem>
           </IonList>
-           
-
+          // </IonContent>  
+          // </IonPage>
     );
   
-}
-
-/**
- * Adds item to inventory list.  
- * @param item 
- */
-export function addItemToList(item:InventoryItemModel)
-{
-  inventoryListItems.push(item);
 }
 
 /**
@@ -218,8 +258,9 @@ const InventoryPage = (props:any) => {
         {<IonTabs>
           <IonRouterOutlet>         
           {/*<Redirect exact path="iKitchen" to="/inventory"/>*/}
-          <Route path="iKitchen" render={()=> getInventoryComponent("kitchen")} exact={true}/>              
-                <Route path="Fridge" render={()=> getInventoryComponent("Fridge")} exact={true}/>              
+          {/*  render={()=> getInventoryComponent("kitchen")} */}
+          <Route path="iKitchen"  render={()=> getInventoryComponent("kitchen")}  exact={true}/>              
+                <Route path="Fridge" render={()=> getInventoryComponent("Cabinet")} exact={true}/>              
                 <Route path="Pantry" render={()=> getInventoryComponent("Pantry")} exact={true}/>  
             </IonRouterOutlet>
           <IonTabBar slot="top">
@@ -230,7 +271,7 @@ const InventoryPage = (props:any) => {
                 <IonLabel> Pantry </IonLabel>
             </IonTabButton>
             <IonTabButton tab="fridge" href='Fridge'>          
-                <IonLabel> Fridge </IonLabel>
+                <IonLabel> Cabinet </IonLabel>
             </IonTabButton>            
         </IonTabBar>        
         </IonTabs>  }    
