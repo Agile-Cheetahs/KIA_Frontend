@@ -146,8 +146,6 @@ const InventoryPage = (props:any) => {
   const [errorToast] = useIonToast();
   const [messageToast] = useIonToast();
 
-  // FOr add Item Modal
-  const [isModalOpen, setIsModalOpen] = useState(false);
   
   return (<>
   <IonHeader>
@@ -200,33 +198,34 @@ const InventoryPage = (props:any) => {
     
   </IonHeader>
   <IonContent>  
-  <IonButton>
+  {/*<IonButton>
     <IonLabel>Edit Tab</IonLabel>
     <IonIcon icon={createOutline}/>
-  </IonButton>  
+        </IonButton>  */}
+  
+  
   <IonReactRouter>
         {<IonTabs>
-          <IonRouterOutlet>              
-                <Route path="/Fridge" render={()=> <Inventory token={props.token} location="Fridge"/>} exact={true}/>              
-                <Route path="/Pantry" render={()=> <Inventory token={props.token} location="Pantry"/>} exact={true}/>  
+          <IonRouterOutlet>         
+          {/*<Redirect exact path="iKitchen" to="/inventory"/>*/}
+          <Route path="iKitchen" render={()=> <Inventory token={props.token} location="Kitchen"/>} exact={true}/>              
+                <Route path="Fridge" render={()=> <Inventory token={props.token} location="Fridge"/>} exact={true}/>              
+                <Route path="Pantry" render={()=> <Inventory token={props.token} location="Pantry"/>} exact={true}/>  
             </IonRouterOutlet>
           <IonTabBar slot="top">
-            <IonTabButton tab="pantry" href='/Pantry'>          
+          <IonTabButton tab="kitchen" href='iKitchen'>          
+                <IonLabel> Kitchen </IonLabel>
+            </IonTabButton>
+            <IonTabButton tab="pantry" href='Pantry'>          
                 <IonLabel> Pantry </IonLabel>
             </IonTabButton>
-            <IonTabButton tab="fridge" href='/Fridge'>          
+            <IonTabButton tab="fridge" href='Fridge'>          
                 <IonLabel> Fridge </IonLabel>
-            </IonTabButton>
+            </IonTabButton>            
         </IonTabBar>        
         </IonTabs>  }    
       </IonReactRouter>
     {/*<Inventory token={props.token}/> */}
- 
-    {/* <IonButton id="open-modal">
-      <IonIcon icon={addCircle} />      
-    </IonButton>
-     */}
-    
   </IonContent>
 </>);
 };
