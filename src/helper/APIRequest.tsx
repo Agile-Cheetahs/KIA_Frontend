@@ -74,7 +74,7 @@ export async function login(requestObject: Object) {
         // Log any errors to the console
         console.error("There has been a problem with your fetch operation:", error);
         const data = await response.json();
-s
+
         return { response: "failed", status: error.msg, data: data};
     }
 }
@@ -85,7 +85,7 @@ s
 
 //logout
 
-export async function logout(requestObject: Object) {
+export async function logout(requestObject: any) {
     
     let response;
     try {
@@ -101,6 +101,42 @@ export async function logout(requestObject: Object) {
             },
             //  credentials: "include",
             body: JSON.stringify(requestObject),
+        });
+
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        // Parse the JSON response
+        const data = await response.json();
+
+        // Return the data
+        return {...data, response: "successful"};
+
+    }
+    catch (error : any) {
+        // Log any errors to the console
+        console.error("There has been a problem with your fetch operation:", error);
+        const data = await response.json();
+        return { response: "failed", status: error.msg, data: data};
+    }
+}
+
+export async function getInventory(requestObject: any)
+{
+    let response;
+    try {
+
+        const endpoint = '/api/inventory/me/';
+
+         response = await fetch(endpoint, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Token ${requestObject.token}`
+            },
+            //  credentials: "include",
+           
         });
 
 

@@ -18,6 +18,7 @@ import { OverlayEventDetail } from '@ionic/core/components';
 import './AddEditItemModal.scss';
 import { validateOptionalSelectText, validateUnits, validateDate, validateItemName, validateNumber, validateEmpty, validateLocationTab } from '../../helper/Validation';
 import { addEditItems, concatenateArraysAndJoin } from '../../helper/APIRequest';
+import { addItemToList,InventoryItemModel } from '../InventoryPage';
 
 // COMMON CONSTANTS/ maps
 const ADD = "add";
@@ -189,7 +190,7 @@ const AddEditItemModal = (props) => {
 
 
 
-    const addEditRequest = {
+    const addEditRequest:InventoryItemModel = {
       //full name string split here
       "name": addEditObject.itemName,
       "quantity": addEditObject.quantity,
@@ -200,7 +201,7 @@ const AddEditItemModal = (props) => {
 
     if (action == EDIT) {
       // TODO: add string to the end
-      addEditRequest.id = editItem.id;
+      //addEditRequest.id = editItem.id;
     }
 
     if (addEditObject.expirationDate) {
@@ -226,12 +227,9 @@ const AddEditItemModal = (props) => {
           duration: 1500,
           position: "top",
           color: "success"
-        });
-        listItems.push( {category:"Cereal",
-        itemName:"Trix",
-        quantity:1,
-        units:"Count"});
-        modal.current?.dismiss();
+        });        
+        addItemToList(addEditRequest)
+        
       }
     });
 
@@ -249,7 +247,7 @@ const AddEditItemModal = (props) => {
   // }
 
   return (
-        <IonModal ref={modal} trigger="open-modal" onWillDismiss={(ev) => onWillDismiss(ev)}>
+        <IonModal ref={modal} trigger={props.modalTriggerID} onWillDismiss={(ev) => onWillDismiss(ev)}>
           <IonHeader>
             <IonToolbar>
               <IonButtons slot="start">
