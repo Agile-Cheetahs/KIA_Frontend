@@ -79,8 +79,8 @@ const AddEditItemModal = (props) => {
   const categoryList = [{ id: 1, name: "Fruit" },
   { id: 2, name: "Grocery" },
   { id: 3, name: "Water" },
-  { id: 3, name: "Ice" },
-  { id: 3, name: "Cereal" }
+  { id: 4, name: "Ice" },
+  { id: 5, name: "Cereal" }
   ]
   //props.categoryList;
   const unitTypes = [{ id: 1, name: "count" },

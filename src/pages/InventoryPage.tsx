@@ -24,22 +24,29 @@ export interface InventoryItemModel{
 }
 
 let inventoryListItems = [
-  {category:"Cereal",
+  {
+    id: 1,
+    category:"Cereal",
   name:"Lucky Charms",
   quantity:1,
   unit:"count",
   location: "Pantry"},
-  {category:"Fruit",
+  { id: 2,
+    category:"Fruit",
   name:"Apple",
   quantity:1,
   unit:"count",
   location: "Fridge"},
-  {category:"Ice",
+  {
+    id: 3,
+    category:"Ice",
   name:"Ice",
   quantity:1,
   unit:"lb",
   location: "Fridge"},
-  {category:"Water",
+  {
+    id: 4,
+    category:"Water",
   name:"Irish Spring Gallon Water",
   quantity:1,
   unit:"g",
@@ -62,10 +69,10 @@ function InventoryItemView(props:any){
             <IonLabel>
               {props.unit}
             </IonLabel>
-            <IonButton id={"listItemID" + props.listIndex}>
+            <IonButton id={"edit-item-" + props.id} className="">
               <IonIcon icon={createOutline}/>
             </IonButton>                   
-            <IonButton onClick={()=>{props.setInventoryItem(props.inventoryItems.filter(
+            <IonButton onClick={()=>{props.setInventoryItems(props.inventoryItems.filter(
               (a:any)=>a.name !== props.itemName
             )
 
@@ -73,7 +80,7 @@ function InventoryItemView(props:any){
               <IonIcon icon={trash}/>
             </IonButton>
          
-            <AddEditItemModal modalTriggerID={"listItemID" + props.listIndex} action="edit" editItem={inventoryListItems[props.listIndex]} token={props.token}
+            <AddEditItemModal modalTriggerID={"edit-item-" + props.id} action="edit" editItem={props.item} token={props.token}
             />
             {/* listItems={{itemName:props.name, quantity:props.quantity}} */}
           </IonItem>;
@@ -94,20 +101,21 @@ function Inventory(props:any)
       modal.current?.dismiss();*/
     }
   });
-  const [inventoryItems, setInventoryItem ] = useState(inventoryListItems);  
-  let filteredItems = inventoryItems.filter((item) => item.location === props.location);
+ 
+  let filteredItems = props.inventoryItems.filter((item) => item.location === props.location);
     return(
       //{this.state.inventoryListItems.map((itemName, category, quantity,))}       
           <IonList>
-          {filteredItems.map((item,index) => 
-          <InventoryItemView key={index} 
+          {filteredItems.map((item, index) => 
+          <InventoryItemView key={item.id} 
             category={item.category}
             itemName={item.name}
             quantity={item.quantity}
             unit={item.unit}
-            listIndex = {index}
-            inventoryItems = {filteredItems}
-            setInventoryItem = {filteredItems}/>)}
+            id={item.id}
+            item={item}
+            inventoryItems = {props.inventoryItems}
+            setInventoryItems = {props.setInventoryItems}/>)}
           <IonItem className={"add-item-row"}>
           <IonButton size="default" expand={"block"} id={"AddInventoryItem"}>
             <IonIcon slot="icon-only" icon={addCircle}></IonIcon>
@@ -146,6 +154,9 @@ const InventoryPage = (props:any) => {
   const [errorToast] = useIonToast();
   const [messageToast] = useIonToast();
 
+  const [inventoryItems, setInventoryItems ] = useState(inventoryListItems); 
+  
+  const getInventoryComponent = (location) => (<Inventory inventoryItems={inventoryItems} setInventoryItems={setInventoryItems} token={props.token} location={location}/>);
   
   return (<>
   <IonHeader>
@@ -202,15 +213,14 @@ const InventoryPage = (props:any) => {
     <IonLabel>Edit Tab</IonLabel>
     <IonIcon icon={createOutline}/>
         </IonButton>  */}
-  
-  
+
   <IonReactRouter>
         {<IonTabs>
           <IonRouterOutlet>         
           {/*<Redirect exact path="iKitchen" to="/inventory"/>*/}
-          <Route path="iKitchen" render={()=> <Inventory token={props.token} location="Kitchen"/>} exact={true}/>              
-                <Route path="Fridge" render={()=> <Inventory token={props.token} location="Fridge"/>} exact={true}/>              
-                <Route path="Pantry" render={()=> <Inventory token={props.token} location="Pantry"/>} exact={true}/>  
+          <Route path="iKitchen" render={()=> getInventoryComponent("kitchen")} exact={true}/>              
+                <Route path="Fridge" render={()=> getInventoryComponent("Fridge")} exact={true}/>              
+                <Route path="Pantry" render={()=> getInventoryComponent("Pantry")} exact={true}/>  
             </IonRouterOutlet>
           <IonTabBar slot="top">
           <IonTabButton tab="kitchen" href='iKitchen'>          
