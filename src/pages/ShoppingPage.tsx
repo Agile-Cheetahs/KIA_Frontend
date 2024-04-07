@@ -1,7 +1,7 @@
 import React from 'react';
 import { IonContent, IonHeader, IonTitle, IonToolbar } from '@ionic/react';
 
-const ShoppingPage = () => (
+const ShoppingPage = (props:any) => (
   <>
     <IonHeader>
       <IonToolbar>

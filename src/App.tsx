@@ -31,6 +31,7 @@ import KitchenPage from './pages/KitchenPage';
 import ShoppingPage from './pages/ShoppingPage';
 import AddEditItemModal from './pages/inventory/AddEditItemModal';
 import Login from './pages/Login';
+import RecipesPage from './pages/Recipes';
 
 setupIonicReact();
 
@@ -82,12 +83,15 @@ const App: React.FC = () => {
         <Route path="/kitchen" exact={true}>
           <KitchenPage token={token} setToken={saveToken} />
         </Route>
-        <Route path="/inventory" exact={true}>
+        {/*<Route path="/inventory" exact={true}>
           <InventoryPage history={history} token={token} setToken={saveToken} />
+        </Route>
+        <Route path="/recipes" exact={true}>
+          <RecipesPage history={history} token={token} setToken={saveToken} />
         </Route>
         <Route path="/shopping" exact={true}>
           <ShoppingPage setToken={saveToken} />
-        </Route>
+      </Route> */}
         {/* TODO: hook following up to inventory main page item actions  */}
         <Route path="/addinventory">
           <AddEditItemModal token={token} setToken={saveToken} action={"add"} />

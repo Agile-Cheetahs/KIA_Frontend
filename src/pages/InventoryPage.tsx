@@ -196,7 +196,7 @@ const InventoryPage = (props:any) => {
 
   const [inventoryItems, setInventoryItems ] = useState(inventoryListItems); 
   
-  const getInventoryComponent = (location) => (<Inventory inventoryItems={inventoryItems} setInventoryItems={setInventoryItems} token={props.token} location={location}/>);
+  const getInventoryComponent = (location:any) => (<Inventory inventoryItems={inventoryItems} setInventoryItems={setInventoryItems} token={props.token} location={location}/>);
   
   return (<>
   <IonHeader>
@@ -257,20 +257,20 @@ const InventoryPage = (props:any) => {
   <IonReactRouter>
         {<IonTabs>
           <IonRouterOutlet>         
-          {/*<Redirect exact path="iKitchen" to="/inventory"/>*/}
+          {<Redirect exact path="/inventory" to="/Inventory/Kitchen"/>}
           {/*  render={()=> getInventoryComponent("kitchen")} */}
-          <Route path="iKitchen"  render={()=> getInventoryComponent("kitchen")}  exact={true}/>              
-                <Route path="Fridge" render={()=> getInventoryComponent("Cabinet")} exact={true}/>              
-                <Route path="Pantry" render={()=> getInventoryComponent("Pantry")} exact={true}/>  
+          <Route path="/Inventory/Kitchen"  render={()=> getInventoryComponent("kitchen")}  exact={true}/>              
+                <Route path="/Inventory/Fridge" render={()=> getInventoryComponent("Cabinet")} exact={true}/>              
+                <Route path="/Inventory/Pantry" render={()=> getInventoryComponent("Pantry")} exact={true}/>  
             </IonRouterOutlet>
           <IonTabBar slot="top">
-          <IonTabButton tab="kitchen" href='iKitchen'>          
+          <IonTabButton tab="kitchen" href='/Inventory/Kitchen'>          
                 <IonLabel> Kitchen </IonLabel>
             </IonTabButton>
-            <IonTabButton tab="pantry" href='Pantry'>          
+            <IonTabButton tab="pantry" href='/Inventory/Pantry'>          
                 <IonLabel> Pantry </IonLabel>
             </IonTabButton>
-            <IonTabButton tab="fridge" href='Fridge'>          
+            <IonTabButton tab="fridge" href='/Inventory/Fridge'>          
                 <IonLabel> Cabinet </IonLabel>
             </IonTabButton>            
         </IonTabBar>        

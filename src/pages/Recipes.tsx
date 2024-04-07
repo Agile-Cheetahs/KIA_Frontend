@@ -2,7 +2,7 @@ import React from 'react';
 import { IonContent, IonHeader, IonTitle, IonToolbar } from '@ionic/react';
 import './Home.css';
 
-const RecipesPage = () => (
+const RecipesPage = (props:any) => (
   <>
     <IonHeader>
       <IonToolbar>
