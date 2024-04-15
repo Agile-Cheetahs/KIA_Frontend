@@ -2,7 +2,7 @@ import React from 'react';
 import { IonContent,
         IonPage,
         IonHeader,
-        IonTitle,
+        IonNav,
         IonButton, 
         IonLabel,
         IonTabButton,      
@@ -31,7 +31,9 @@ const KitchenPage: React.FC = (props) => {
                     <IonTabs>
                         <IonRouterOutlet>
                             <Redirect exact path="/kitchen" to="/inventory"/>
-                            <Route path="/shopping" render={(props)=> <ShoppingPage {...props}/>} exact={true}/>
+                            <Route path="/shopping" exact={true}>
+                                <IonNav rootParams={{...props, token: props.token, setToken: props.setToken }} root={(props) => <ShoppingPage {...props} />}></IonNav>    
+                            </Route>
                             <Route path="/inventory" render={(props)=><InventoryPage  token={props.token} setToken={props.setToken} {...props}/>} exact={true}/>
                             <Route path="/recipes" render={()=><RecipesPage />} exact={true}/>
                         </IonRouterOutlet>

@@ -1,6 +1,6 @@
 
 import {
-  IonContent, IonHeader, IonTitle, IonToolbar, IonButton, useIonToast, IonButtons, IonIcon,
+  IonContent, IonHeader, IonTitle, IonToolbar, IonButton, IonPage, IonButtons, IonIcon,
   IonLabel, IonBackButton, IonList, IonItem, IonListHeader
 } from '@ionic/react';
 
@@ -18,10 +18,7 @@ const ShoppingList = (props) => {
 
   let shoppingLists = props.shoppingLists;
   let dispatch = props.dispatch;
-
-
-
-  let { id } = useParams();
+  let id = props.id;
 
   const shoppinglist = shoppingLists.find((element) => Number(id) == element.id);
 
@@ -29,13 +26,13 @@ const ShoppingList = (props) => {
   const name = shoppinglist.name;
 
   return (
-    <>
+    <IonPage>
       <IonHeader>
         <IonToolbar>
           <IonButtons slot="start">
-            <IonBackButton></IonBackButton>
+            <IonBackButton defaultHref="/shopping"></IonBackButton>
           </IonButtons>
-          <IonTitle>Back</IonTitle>
+          
         </IonToolbar>
       </IonHeader>
       <IonContent className="ion-padding">
@@ -83,7 +80,7 @@ const ShoppingList = (props) => {
             </IonItem>)}
         </IonList>
       </IonContent>
-    </>
+    </IonPage>
   );
 };
 

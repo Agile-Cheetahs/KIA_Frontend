@@ -1,7 +1,7 @@
 import React from 'react';
 import {
-  IonContent, IonHeader, IonTitle, IonToolbar, IonButton, useIonToast, IonButtons, IonIcon, useIonLoading,
-  IonLabel, IonRouterOutlet, IonList, IonItem, IonItemOptions, IonItemSliding, IonItemOption
+  IonContent, IonHeader, IonTitle, IonToolbar, IonButton, useIonToast, IonButtons, IonIcon, IonNavLink,
+  IonLabel, IonRouterOutlet, IonList, IonItem, IonItemOptions, IonItemSliding, IonItemOption, IonPage
 } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
 import {
@@ -161,15 +161,15 @@ function ShoppingPageMain(props: any) {
 
       {shoppingLists.map((item) =>
         <IonItemSliding>
-
-          <IonItem routerLink={`/shoppinglist/${item.id}`}>
+              <IonNavLink routerDirection="forward" componentProps={
+        {id: item.id, history:history, shoppingLists:shoppingLists, dispatch:dispatch, token:props.token, setToken:props.setToken}
+      } component={(props) =>  <ShoppingList {...props}/>  }>
+          <IonItem >
             <IonLabel>
               {item.name}
             </IonLabel>
-
-
           </IonItem>
-
+          </IonNavLink>
           <IonItemOptions side="end">
             <IonItemOption>
 
@@ -192,6 +192,10 @@ function ShoppingPageMain(props: any) {
         </IonItemSliding>
       )}
       <IonItem className={"add-shopping-row"}>
+        {/* TODO: need to fix the ID below after new row is added */}
+      {/* <IonNavLink routerDirection="forward"  componentProps={
+        {id: "",history:history, shoppingLists:shoppingLists, dispatch:dispatch, token:props.token, setToken:props.setToken}
+      } component={(props) =>  <ShoppingList {...props}/>  }> */}
         <IonButton size="default" expand={"block"} id={"addShopping"} onClick={() => {
           //open shopping list add
           // Add API call here
@@ -204,11 +208,12 @@ function ShoppingPageMain(props: any) {
             itemList: []
           }
           dispatch(newitem);
-          props.history.push(`/shoppinglist/${newitem.id}`);
+          // props.history.push(`/shoppinglist/${newitem.id}`);
 
         }}>
           <IonIcon slot="icon-only" icon={addCircle}></IonIcon>
         </IonButton>
+      {/* </IonNavLink> */}
 
       </IonItem>
 
@@ -232,16 +237,17 @@ const ShoppingPage = (props: any) => {
     fixedShoppingListItems
   );
 
-  let history = useHistory();
+  let history = props.history;
 
 
 
-  return (<>
+  return (<IonPage>
     <IonHeader>
 
       <IonToolbar>
         <IonTitle>Shopping Lists</IonTitle>
         <IonButtons slot="primary">
+      
           <IonButton onClick={() => {
             //TODO: refactor this commondlog out 
             logout({ token: props.token }).then((resp) => {
@@ -280,22 +286,22 @@ const ShoppingPage = (props: any) => {
 
     </IonHeader>
     <IonContent>
-
-      <IonReactRouter>
+    <ShoppingPageMain shoppingLists={lists} dispatch={dispatch} token={props.token} setToken={props.setToken}></ShoppingPageMain>
+      {/* <IonReactRouter>
         {
           <IonRouterOutlet>
             <Route path="/shoppinglist/:id" exact={true}>
               <ShoppingList history={history} shoppingLists={lists} dispatch={dispatch} token={props.token} setToken={props.setToken}/>
-            </Route>
-            <Route path="/shopping" exact={true}>
-              <ShoppingPageMain shoppingLists={lists} dispatch={dispatch} token={props.token} setToken={props.setToken}></ShoppingPageMain>
+            </Route> */}
+            {/* <Route path="/shopping" exact={true}>
+            
             </Route>
           </IonRouterOutlet>
         }
-      </IonReactRouter>
+      </IonReactRouter> */}
       {/*<Inventory token={props.token}/> */}
     </IonContent>
-  </>);
+    </IonPage>);
 };
 
 export default ShoppingPage;

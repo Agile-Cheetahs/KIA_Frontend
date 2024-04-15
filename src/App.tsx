@@ -1,6 +1,6 @@
 import { Redirect, Route } from 'react-router-dom';
 import { useState } from 'react';
-import { IonApp, IonRouterOutlet, setupIonicReact, useIonLoading } from '@ionic/react';
+import { IonApp, IonRouterOutlet, setupIonicReact, useIonLoading, IonNav } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
 
 
