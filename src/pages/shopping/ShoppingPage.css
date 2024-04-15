@@ -1,0 +1,7 @@
+
+/* wrapper over add item btn */
+ .add-list-row ion-button {
+    min-width: 10%;
+    width: fit-content;
+    margin: 0 auto;
+}

@@ -198,7 +198,7 @@ const InventoryPage = (props:any) => {
   
   const getInventoryComponent = (location) => (<Inventory inventoryItems={inventoryItems} setInventoryItems={setInventoryItems} token={props.token} location={location}/>);
   
-  return (<>
+  return (<IonPage>
   <IonHeader>
 
     <IonToolbar>
@@ -278,7 +278,7 @@ const InventoryPage = (props:any) => {
       </IonReactRouter>
     {/*<Inventory token={props.token}/> */}
   </IonContent>
-</>);
+</IonPage>);
 };
 
 export default InventoryPage;
