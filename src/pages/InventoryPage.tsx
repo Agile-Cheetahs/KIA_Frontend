@@ -12,6 +12,7 @@ import './InventoryPage.css';
 import AddInventoryItemPage from './AddInventoryItemPage';
 import {addCircle, trash, createOutline} from 'ionicons/icons';
 import AddEditItemModal from './inventory/AddEditItemModal';
+import AddEditTabsModal from './inventory/AddEditTabsModal';
 
 export interface InventoryItemModel{
   category:string;
@@ -204,6 +205,10 @@ const InventoryPage = (props:any) => {
     <IonToolbar>
       <IonTitle>Inventory</IonTitle>
       <IonButtons slot="primary">
+        <IonButton id="open-modal-tabs">          
+           <IonIcon icon={createOutline}></IonIcon>
+           <AddEditTabsModal value={kitchenTabs}></AddEditTabsModal>
+        </IonButton>   
         <IonButton onClick={() => {
           //log out 
           logout({ token: props.token }).then((resp) => {
@@ -237,6 +242,7 @@ const InventoryPage = (props:any) => {
         }} >
           <IonIcon slot="icon-only" icon={logOut}></IonIcon>
         </IonButton>
+        
         
         {/* <IonButton>
             <IonIcon slot="icon-only" icon={person}></IonIcon>
@@ -272,10 +278,11 @@ const InventoryPage = (props:any) => {
             </IonTabButton>
             <IonTabButton tab="fridge" href='/Inventory/Fridge'>          
                 <IonLabel> Cabinet </IonLabel>
-            </IonTabButton>            
+            </IonTabButton>                     
         </IonTabBar>        
         </IonTabs>  }    
       </IonReactRouter>
+      
     {/*<Inventory token={props.token}/> */}
   </IonContent>
 </>);

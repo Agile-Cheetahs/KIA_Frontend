@@ -30,7 +30,7 @@ const KitchenPage: React.FC = (props:any) => {
                 <IonReactRouter>
                     <IonTabs>
                         <IonRouterOutlet>
-                            {<Redirect exact path="/kitchen" to="/inventory"/>}
+                            {/*<Redirect exact path="/kitchen" to="/inventory"/>*/}
                             <Route path="/shopping" render={(propsR)=> <ShoppingPage token={props.token} setToken={props.setToken} {...propsR} />} exact={true}/>
                             <Route exact path="/inventory" render={(propsR)=><InventoryPage  token={props.token} setToken={props.setToken} {...propsR}/>} exact={true}/>
                             <Route path="/recipes" render={(propsR)=><RecipesPage  token={props.token} setToken={props.setToken} {...propsR}/>} exact={true}/>
