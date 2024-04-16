@@ -1,6 +1,6 @@
 import { Redirect, Route } from 'react-router-dom';
 import { useState } from 'react';
-import { IonApp, IonRouterOutlet, setupIonicReact, useIonLoading } from '@ionic/react';
+import { IonApp, IonRouterOutlet, setupIonicReact, useIonLoading, IonNav } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
 
 
@@ -28,7 +28,7 @@ import './theme/variables.css';
 /*pages*/
 import InventoryPage from './pages/InventoryPage';
 import KitchenPage from './pages/KitchenPage';
-import ShoppingPage from './pages/ShoppingPage';
+import ShoppingPage from './pages/shopping/ShoppingPage';
 import AddEditItemModal from './pages/inventory/AddEditItemModal';
 import Login from './pages/Login';
 import RecipesPage from './pages/Recipes';
@@ -85,7 +85,7 @@ const App: React.FC = () => {
           <KitchenPage token={token} setToken={saveToken} />
         </Route>
         <Route path="/shopping" exact={true}>
-          <ShoppingPage setToken={saveToken} />
+          <ShoppingPage setToken={saveToken} token={token} />
         </Route>
         {/*<Route path="/inventory" exact={true}>
           <InventoryPage history={history} token={token} setToken={saveToken} />

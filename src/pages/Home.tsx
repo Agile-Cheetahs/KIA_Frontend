@@ -16,7 +16,6 @@ import {
   useIonViewWillEnter,
   IonRouterOutlet
 } from '@ionic/react';
-import { IonReactRouter } from '@ionic/react-router';
 import { Route, Redirect } from 'react-router';
 import './Home.css';
 import KitchenPage from './KitchenPage';

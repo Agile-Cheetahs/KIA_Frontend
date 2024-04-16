@@ -2,7 +2,7 @@ import React from 'react';
 import { IonContent,
         IonPage,
         IonHeader,
-        IonTitle,
+        IonNav,
         IonButton, 
         IonLabel,
         IonTabButton,      
@@ -20,7 +20,7 @@ import {cart, restaurant, book } from 'ionicons/icons';
 //<ion-icon name="cart-outline"></ion-icon>;
 //<ion-icon name="restaurant-outline"></ion-icon>;
 
-import ShoppingPage from './ShoppingPage';
+import ShoppingPage from './shopping/ShoppingPage';
 import InventoryPage from './InventoryPage';
 import RecipesPage from './Recipes';
 
@@ -30,10 +30,12 @@ const KitchenPage: React.FC = (props:any) => {
                 <IonReactRouter>
                     <IonTabs>
                         <IonRouterOutlet>
-                            {/*<Redirect exact path="/kitchen" to="/inventory"/>*/}
-                            <Route path="/shopping" render={(propsR)=> <ShoppingPage token={props.token} setToken={props.setToken} {...propsR} />} exact={true}/>
-                            <Route exact path="/inventory" render={(propsR)=><InventoryPage  token={props.token} setToken={props.setToken} {...propsR}/>} exact={true}/>
-                            <Route path="/recipes" render={(propsR)=><RecipesPage  token={props.token} setToken={props.setToken} {...propsR}/>} exact={true}/>
+                            <Redirect exact path="/kitchen" to="/inventory"/>
+                            <Route path="/shopping" exact={true}>
+                                <IonNav rootParams={{...props, token: props.token, setToken: props.setToken }} root={(props) => <ShoppingPage {...props} />}></IonNav>    
+                            </Route>
+                            <Route path="/inventory" render={(props)=><InventoryPage  token={props.token} setToken={props.setToken} {...props}/>} exact={true}/>
+                            <Route path="/recipes" render={()=><RecipesPage />} exact={true}/>
                         </IonRouterOutlet>
                     
                         <IonTabBar slot="bottom">
