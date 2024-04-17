@@ -123,6 +123,47 @@ export async function logout(requestObject: any) {
     }
 }
 
+// Inventory APIs
+
+export async function addInventory(requestObject: any, method: string)
+{
+    let response;
+    let token = requestObject.token
+    delete requestObject.token 
+    try {
+
+        const endpoint = '/api/inventory/me/';
+         response = await fetch(BASE_API_URL + endpoint, {
+            method: method,
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Token ${token}`
+            },
+            body: JSON.stringify(requestObject)
+            //  credentials: "include",
+           
+        });
+
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        // Parse the JSON response
+        const data = await response.json();
+
+        // Return the data
+        return {...data, response: "successful"};
+
+    }
+    catch (error : any) {
+        // Log any errors to the console
+        console.error("There has been a problem with your fetch operation:", error);
+        const data = await response.json();
+        return { response: "failed", status: error.msg, data: data};
+    }
+}
+
+
 export async function getInventory(requestObject: any)
 {
     let response;
@@ -130,7 +171,7 @@ export async function getInventory(requestObject: any)
 
         const endpoint = '/api/inventory/me/';
 
-         response = await fetch(endpoint, {
+         response = await fetch(BASE_API_URL + endpoint, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',

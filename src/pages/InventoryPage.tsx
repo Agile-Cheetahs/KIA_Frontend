@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { IonContent, IonHeader, IonTitle, IonToolbar, IonButton, useIonToast, IonButtons, IonIcon,  useIonLoading,
   IonLabel, IonRouterOutlet, IonList, IonItem,IonTabs, IonTab,IonPage, IonListHeader,  IonTabBar, IonTabButton, useIonModal } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
@@ -6,10 +6,10 @@ import { Route, Redirect } from 'react-router';
 import { search, personCircle, logOut, person } from 'ionicons/icons';
 import { getInventory,logout, concatenateArraysAndJoin } from '../helper/APIRequest';
 import {useState} from 'react';
+import { useNavigate } from 'react-router-dom';
 
 
 import './InventoryPage.css';
-import AddInventoryItemPage from './AddInventoryItemPage';
 import {addCircle, trash, createOutline} from 'ionicons/icons';
 import AddEditItemModal from './inventory/AddEditItemModal';
 
@@ -60,8 +60,6 @@ let inventoryListItems = [
   location: "Cabinet"}
 ]
 
-let kitchenTabs = ["Kitchen", "Cabinet", "Pantry" ];
-
 function InventoryItemView(props:any){
   return  <IonItem>
             <IonLabel>
@@ -92,25 +90,11 @@ function InventoryItemView(props:any){
          
             <AddEditItemModal modalTriggerID={"edit-item-" + props.id} action="edit" actionConfirm={props.actionConfirm} editItem={props.item} token={props.token}
             />
-            {/* listItems={{itemName:props.name, quantity:props.quantity}} */}
           </IonItem>;
 }
 
 function Inventory(props:any)
 {  
-  let inventoryData = getInventory({token:props.token}).then((resp) => {
-    if (resp.response == "failed") {
-      const msg = concatenateArraysAndJoin(resp.data);      
-
-    } else if (resp.response == "successful") {
-      
-      /*listItems.push( {category:"Cereal",
-      itemName:"Trix",
-      quantity:1,
-      units:"Count"});
-      modal.current?.dismiss();*/
-    }
-  });
   const addItemToList = (action: string, item: InventoryItemModel) => {
     if (action == "add") {
 
@@ -126,17 +110,10 @@ function Inventory(props:any)
 
       )
     }
-
-    // }).filter(
-    //   (a:any)=>a.name !== props.itemName
-    // )
   };
 
   let filteredItems = props.inventoryItems.filter((item) => item.location === props.location);
     return(
-      //{this.state.inventoryListItems.map((itemName, category, quantity,))}
-      // <IonPage>    
-      //    <IonContent>  
           <IonList>
             <IonListHeader className={"inventory-item-headers"}>
             <IonLabel>
@@ -193,8 +170,67 @@ function removeItemFromList(index:number)
 const InventoryPage = (props:any) => {
   const [errorToast] = useIonToast();
   const [messageToast] = useIonToast();
+  const {showLoading: showLoading, hideLoading: hideLoading, token: token} = props
+  const [inventoryId, setInventoryId] = useState(0);
+  const [inventoryItems, setInventoryItems ] = useState([]);
 
-  const [inventoryItems, setInventoryItems ] = useState(inventoryListItems); 
+  useEffect(()=> {
+    //fetch inventory id and items if not found
+    // TODO:
+    const showL = async () => {
+      await showLoading();
+    }
+    
+    
+    // showL();
+    getInventory({token: props.token}).then((resp) => {
+      if (resp.response == "failed") {
+
+
+        // merge together all response error message for a toast message.
+        const msg = concatenateArraysAndJoin(resp.data);
+
+        errorToast({
+          message: resp.detail,
+          duration: 1500,
+          position: "top",
+          color: "warning"
+        });
+
+      }
+      
+      
+       else if (resp.response == "successful") {
+        setInventoryId(resp[0]['inventory_id']);
+        setInventoryItems(resp[0]['items']);
+      //   const msg = "User logged in succesfully!";
+
+      //   messageToast({
+      //     message: msg,
+      //     duration: 1500,
+      //     position: "top",
+      //     color: "success"
+      //   });
+       }
+      //  hideLoading();
+
+    });
+    // .catch((err) => {
+    //   const msg = concatenateArraysAndJoin(err.data);
+
+    //   errorToast({
+    //     message: msg,
+    //     duration: 1500,
+    //     position: "top",
+    //     color: "warning"
+    //   });
+
+    // });
+
+  }, [token])
+
+  
+   
   
   const getInventoryComponent = (location) => (<Inventory inventoryItems={inventoryItems} setInventoryItems={setInventoryItems} token={props.token} location={location}/>);
   
@@ -229,7 +265,7 @@ const InventoryPage = (props:any) => {
               });
               // set the login token here.
               props.setToken('');
-              props.history.push('/');
+              //props.history.push('/');
             }
             
           });
