@@ -32,7 +32,7 @@ import ShoppingPage from './pages/shopping/ShoppingPage';
 import AddEditItemModal from './pages/inventory/AddEditItemModal';
 import Login from './pages/Login';
 import RecipesPage from './pages/Recipes';
-import AddEditTabsModal from './pages/inventory/addEditTabsModal';
+import AddEditTabsModal from './pages/inventory/AddEditTabsModal';
 
 setupIonicReact();
 

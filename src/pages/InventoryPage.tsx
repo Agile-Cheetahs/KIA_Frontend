@@ -4,7 +4,7 @@ import { IonContent, IonHeader, IonTitle, IonToolbar, IonButton, useIonToast, Io
 import { IonReactRouter } from '@ionic/react-router';
 import { Route, Redirect } from 'react-router';
 import { search, personCircle, logOut, person } from 'ionicons/icons';
-import { getInventory,logout, concatenateArraysAndJoin } from '../helper/APIRequest';
+import { getInventory,logout, concatenateArraysAndJoin, addEditItems } from '../helper/APIRequest';
 import {useState} from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -19,11 +19,64 @@ export interface InventoryItemModel{
   category:string;
   name:string;
   quantity:number;
-  unit:string;  
+  units:string;  
   location:string;
   id?:any;
   expiration_date?:string;
 }
+
+
+const  inventoryListReducer = (lists, action) => {
+  switch (action.type) {
+    case 'add-item': {
+      // const addEditRequest: InventoryItemModel = {
+      //   //full name string split here
+      //   "name": addEditObject.itemName,
+      //   "quantity": addEditObject.quantity,
+      //   "unit": addEditObject.units,
+      //   "location": addEditObject.locationTab,
+      //   "category": addEditObject.category
+      // };
+  
+      // if (action == EDIT) {
+      //  
+      //   addEditRequest.id = editItem.id;
+      // }
+  
+      // if (addEditObject.expirationDate) {
+      //   addEditRequest.expiration_date = addEditObject.expirationDate;
+      // }
+      return [...lists, {
+        id: action.id,
+        name: action.name,
+        starred: action.starred,
+        isComplete: action.isComplete,
+        itemList: []
+      }]
+
+      return lists.map(t =>
+        t.id === action.id ? { ...t, itemList: [...t.itemList,action.newItem] } : t
+      );
+    }
+    case 'edit-item': {
+      return lists.map(t =>
+        t.id === action.id ? { ...t, itemList: t.itemList.map(item =>
+          item.id === action.itemId ? action.newItem : item
+        ) } : t
+      );
+    }
+    case 'remove-item': {
+      return lists.map(t =>
+        t.id === action.id ? { ...t, itemList: t.itemList.filter(item =>
+          item.id !== action.itemId) } : t
+      );
+    }
+    default: {
+      throw Error('Unknown action: ' + action.type);
+    }
+  }
+}
+
 
 let inventoryListItems = [
   {
@@ -77,7 +130,7 @@ function InventoryItemView(props:any){
               {props.quantity + " "}
             </IonLabel>
             <IonLabel>
-              {props.unit}
+              {props.units}
             </IonLabel>
             <IonButton id={"edit-item-" + props.id} className="edit-item" onClick={() => {
 
@@ -85,22 +138,50 @@ function InventoryItemView(props:any){
             }}>
               <IonIcon icon={createOutline}/>
             </IonButton>                   
-            <IonButton onClick={()=>{props.setInventoryItems(props.inventoryItems.filter(
-              (a:any)=>a.name !== props.itemName
-            )
-
-            )}}>
+            <IonButton onClick={()=>{
+             props.setInventoryItems(props.inventoryItems.filter(
+              (a:any)=>a.name !== props.itemName));
+              props.showLoading();
+              addEditItems({id: props.id }, props.token, "remove").then((resp) => {
+                if (resp.response == "failed") {
+                  const msg = concatenateArraysAndJoin(resp.data);
+          
+                  props.errorToast({
+                    message: msg,
+                    duration: 1500,
+                    position: "top",
+                    color: "warning"
+                  });
+          
+          
+                } else if (resp.response == "successful") {
+          
+                  props.messageToast({
+                    message: `User removed item succesfully!`,
+                    duration: 1500,
+                    position: "top",
+                    color: "success"
+                  });
+                  // props.actionConfirm(action, addEditRequest);
+          
+                }
+          
+                props.hideLoading();
+              });
+            
+            }}>
               <IonIcon icon={trash}/>
             </IonButton>
          
             <AddEditItemModal modalTriggerID={"edit-item-" + props.id} action="edit" actionConfirm={props.actionConfirm} editItem={props.item} token={props.token}
+            showLoading={props.showLoading} hideLoading={props.hideLoading}
             />
           </IonItem>;
 }
 
 function Inventory(props:any)
 {  
-  const addItemToList = (action: string, item: InventoryItemModel) => {
+  const addEditItemToList = (action: string, item: InventoryItemModel) => {
     if (action == "add") {
 
       props.setInventoryItems((lst) => {
@@ -141,17 +222,20 @@ function Inventory(props:any)
             category={item.category}
             itemName={item.name}
             quantity={item.quantity}
-            unit={item.unit}
+            units={item.units}
             id={item.id}
             item={item}
+            errorToast={props.errorToast} messageToast={props.messageToast}
             inventoryItems = {props.inventoryItems}
-            actionConfirm={addItemToList}
-            setInventoryItems = {props.setInventoryItems}/>)}
+            actionConfirm={addEditItemToList}
+            setInventoryItems = {props.setInventoryItems}
+            {...props}
+            />)}
           <IonItem className={"add-item-row"}>
           <IonButton size="default" expand={"block"} id={"AddInventoryItem"}>
             <IonIcon slot="icon-only" icon={addCircle}></IonIcon>
           </IonButton> 
-          <AddEditItemModal modalTriggerID={"AddInventoryItem"} actionConfirm={addItemToList} action="add" token={props.token}
+          <AddEditItemModal modalTriggerID={"AddInventoryItem"} actionConfirm={addEditItemToList} action="add" {...props}
             />
           </IonItem>
           </IonList>
@@ -207,8 +291,8 @@ const InventoryPage = (props:any) => {
       
        else if (resp.response == "successful") {
         setInventoryId(resp[0]['inventory_id']);
-        setInventoryItems(resp[0]['items']);
-      //   const msg = "User logged in succesfully!";
+        const recItems = resp[0]['items'].map((item) => ({...item, id: item.item_id}));
+        setInventoryItems(recItems);
 
       //   messageToast({
       //     message: msg,
@@ -237,7 +321,7 @@ const InventoryPage = (props:any) => {
   
    
   
-  const getInventoryComponent = (location:any) => (<Inventory inventoryItems={inventoryItems} setInventoryItems={setInventoryItems} token={props.token} location={location}/>);
+  const getInventoryComponent = (location) => (<Inventory errorToast={errorToast} messageToast={messageToast} inventoryItems={inventoryItems} setInventoryItems={setInventoryItems} {...props} location={location}/>);
   
   return (<IonPage>
   <IonHeader>      
@@ -281,41 +365,31 @@ const InventoryPage = (props:any) => {
         }} >
           <IonIcon slot="icon-only" icon={logOut}></IonIcon>
         </IonButton>
-        
-        
-        {/* <IonButton>
-            <IonIcon slot="icon-only" icon={person}></IonIcon>
-          </IonButton> */}
+
       </IonButtons>
-       {/* <IonButton>
-          <IonIcon icon={createOutline}/>
-        </IonButton>   */}
+
     </IonToolbar>
     
   </IonHeader>
   <IonContent>  
-  {/*<IonButton>
-    <IonLabel>Edit Tab</IonLabel>
-    <IonIcon icon={createOutline}/>
-        </IonButton>  */}
+
 
   <IonReactRouter>
         {<IonTabs>
           <IonRouterOutlet>         
-          {<Redirect exact path="/inventory" to="/Inventory/Kitchen"/>}
-          {/*  render={()=> getInventoryComponent("kitchen")} */}
-          <Route path="/Inventory/Kitchen"  render={()=> getInventoryComponent("kitchen")}  exact={true}/>              
-                <Route path="/Inventory/Fridge" render={()=> getInventoryComponent("Cabinet")} exact={true}/>              
-                <Route path="/Inventory/Pantry" render={()=> getInventoryComponent("Pantry")} exact={true}/>  
+ 
+          <Route path="kitchen"  render={()=> getInventoryComponent("kitchen")}  exact={true}/>              
+                <Route path="Fridge" render={()=> getInventoryComponent("Cabinet")} exact={true}/>              
+                <Route path="Pantry" render={()=> getInventoryComponent("Pantry")} exact={true}/>  
             </IonRouterOutlet>
           <IonTabBar slot="top">
-          <IonTabButton tab="kitchen" href='/Inventory/Kitchen'>          
+          <IonTabButton tab="kitchen" href='kitchen'>          
                 <IonLabel> Kitchen </IonLabel>
             </IonTabButton>
-            <IonTabButton tab="pantry" href='/Inventory/Pantry'>          
+            <IonTabButton tab="pantry" href='Pantry'>          
                 <IonLabel> Pantry </IonLabel>
             </IonTabButton>
-            <IonTabButton tab="fridge" href='/Inventory/Fridge'>          
+            <IonTabButton tab="fridge" href='Fridge'>          
                 <IonLabel> Cabinet </IonLabel>
             </IonTabButton>                     
         </IonTabBar>        

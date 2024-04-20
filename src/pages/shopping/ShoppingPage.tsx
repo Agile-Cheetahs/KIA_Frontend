@@ -1,7 +1,7 @@
 import React from 'react';
 import {
   IonContent, IonHeader, IonTitle, IonToolbar, IonButton, useIonToast, IonButtons, IonIcon, IonNavLink,
-  IonLabel, IonRouterOutlet, IonList, IonItem, IonItemOptions, IonItemSliding, IonItemOption, IonPage
+  IonLabel, IonFooter, IonList, IonItem, IonItemOptions, IonItemSliding, IonItemOption, IonPage
 } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
 import {
@@ -30,9 +30,10 @@ import ShoppingList from './ShoppingList';
 export interface ShoppingListItemModel {
   name: string;
   quantity: number;
-  units: string;
+  unit: string;
   id?:  number;
-  crossed?: boolean
+  crossed?: boolean,
+  isComplete? : boolean
 }
 
 export interface ShoppingListModel {
@@ -61,20 +62,20 @@ let fixedShoppingListItems: ShoppingListModel[] = [
       {  
         name: "Lettuce",
         quantity: 2,
-        units: "lb",
+        unit: "lb",
         id: 1,
         crossed: false},
         {  
           name: "Cereal",
           quantity: 1,
-          units: "count",
+          unit: "count",
           id:2,
           crossed: false},
 
           {  
             name: "apple",
             quantity: 2,
-            units: "count",
+            unit: "count",
             id: 3,
             crossed: false}
     ]
@@ -87,7 +88,7 @@ let fixedShoppingListItems: ShoppingListModel[] = [
     itemList: [ {  
       name: "milk",
       quantity: 2,
-      units: "oz",
+      unit: "oz",
       id: 4,
       crossed: false}]
   },
@@ -123,16 +124,36 @@ function shoppingListReducer(lists, action) {
       )
     }
     case 'add-item': {
-      return lists;
+      // let newitem: ActionModel = {
+      //   type: 'add-item',
+      //   id: 11,
+      //   itemId: false,
+      //   newItem: {},
+      //   itemList: []
+      // }
+
+      return lists.map(t =>
+        t.id === action.id ? { ...t, itemList: [...t.itemList,action.newItem] } : t
+      );
     }
     case 'edit-item': {
-      return lists;
+      return lists.map(t =>
+        t.id === action.id ? { ...t, itemList: t.itemList.map(item =>
+          item.id === action.itemId ? action.newItem : item
+        ) } : t
+      );
+    }
+    case 'remove-item': {
+      return lists.map(t =>
+        t.id === action.id ? { ...t, itemList: t.itemList.filter(item =>
+          item.id !== action.itemId) } : t
+      );
     }
     case 'cross-item': {
       return lists;
     }
     case 'edit': {
-
+      return lists;
     }
     case 'reset': {
       return lists;
@@ -151,6 +172,9 @@ function shoppingListReducer(lists, action) {
 // view shopping list in page
 function ShoppingPageMain(props: any) {
 
+  const [errorToast] = useIonToast();
+  const [messageToast] = useIonToast();
+
   let shoppingLists = props.shoppingLists;
   let dispatch = props.dispatch;
   return (
@@ -160,11 +184,11 @@ function ShoppingPageMain(props: any) {
     <IonList>
 
       {shoppingLists.map((item) =>
-        <IonItemSliding>
+        <IonItemSliding key={item.id}>
               <IonNavLink routerDirection="forward" componentProps={
         {id: item.id, history:history, shoppingLists:shoppingLists, dispatch:dispatch, token:props.token, setToken:props.setToken}
       } component={(props) =>  <ShoppingList {...props}/>  }>
-          <IonItem >
+          <IonItem key={item.id}>
             <IonLabel>
               {item.name}
             </IonLabel>
