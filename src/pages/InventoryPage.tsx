@@ -386,10 +386,10 @@ const InventoryPage = (props:any) => {
           <IonTabButton tab="kitchen" href='kitchen'>          
                 <IonLabel> Kitchen </IonLabel>
             </IonTabButton>
-            <IonTabButton tab="pantry" href='/Inventory/Pantry'>          
+            <IonTabButton tab="pantry" href='Pantry'>          
                 <IonLabel> Pantry </IonLabel>
             </IonTabButton>
-            <IonTabButton tab="fridge" href='/Inventory/Fridge'>          
+            <IonTabButton tab="fridge" href='Fridge'>          
                 <IonLabel> Cabinet </IonLabel>
             </IonTabButton>                     
         </IonTabBar>        
