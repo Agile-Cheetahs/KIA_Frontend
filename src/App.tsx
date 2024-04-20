@@ -45,17 +45,23 @@ const App: React.FC = () => {
   // User login management - move this to useToken.tsx?
   const getToken = () => {
     const tokenString: string | null = sessionStorage.getItem('token');
-    const userToken = JSON.parse(tokenString);
-    return userToken;
+    return tokenString;
   };
   const [token, setToken] = useState(getToken());
   const saveToken = (userToken) => {
-    sessionStorage.setItem('token', JSON.stringify(userToken));
+    sessionStorage.setItem('token', userToken);
     setToken(userToken);
   };
 
+  let appProps = {
+    token : token,
+    setToken :saveToken,
+    showLoading: showLoading,
+    hideLoading: hideLoading
+  }
+
   if (!token) {
-    return <Login setToken={saveToken} />;
+    return <Login {...appProps} />;
   }
 
   const item = {
@@ -68,6 +74,7 @@ const App: React.FC = () => {
     "expirationDate": ""
   };
 
+ 
 
   // const {token, setToken} = useToken();
   return (<IonApp>
@@ -82,10 +89,13 @@ const App: React.FC = () => {
           <Home />
         </Route> */}
         <Route path="/kitchen" exact={true}>
-          <KitchenPage token={token} setToken={saveToken} />
+          <KitchenPage history={history} {...appProps} />
+        </Route>
+        <Route path="/inventory" exact={true}>
+          <InventoryPage history={history} {...appProps} />
         </Route>
         <Route path="/shopping" exact={true}>
-          <ShoppingPage setToken={saveToken} token={token} />
+          <ShoppingPage history={history} setToken={saveToken} token={token} />
         </Route>
         {/*<Route path="/inventory" exact={true}>
           <InventoryPage history={history} token={token} setToken={saveToken} />

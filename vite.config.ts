@@ -7,6 +7,7 @@ export default defineConfig(({mode}) => {
 
   const env = loadEnv(mode, process.cwd());
   const BASE_API_URL = env.VITE_BASE_API_URL;
+  //const BASE_API_URL = "HTTP://127.0.0.1:8000";
   return {
   plugins: [
     react(),

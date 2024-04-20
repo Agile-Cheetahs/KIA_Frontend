@@ -13,16 +13,15 @@ import {
   IonInput,
   IonPage,
   IonToolbar,
-  useIonViewWillEnter,
   IonButton,
   useIonToast
 } from '@ionic/react';
 import { logInOutline } from 'ionicons/icons';
-import { Redirect, useParams } from 'react-router';
+// import { Redirect, useParams } from 'react-router';
 import { useState, useRef } from 'react';
 import './Login.scss';
 import { validateEmail, validatePassword, validateUsername, validateEmpty, validatePhoneNumber } from '../helper/Validation';
-import { register, login } from '../helper/APIRequest';
+import { register, login, addInventory, getInventory, addInventoryLocation } from '../helper/APIRequest';
 
 /* Login/Signup Landing Page
 */
@@ -71,9 +70,9 @@ const Login = (props) => {
   // 0 -> sign in, 1 -> Create account
   const [loginType, setLoginType] = useState(0);
 
+  const {showLoading: showLoading, hideLoading: hideLoading} = props
 
-
-  const [showLoading, hideLoading] = useIonLoading();
+  // const [showLoading, hideLoading] = useIonLoading();
   const [errorToast] = useIonToast();
   const [messageToast] = useIonToast();
 
@@ -222,7 +221,7 @@ const Login = (props) => {
                   //onIonChange={(event) => validate(event)}
                   ></IonInput>
                 </IonItem>
-
+                {/* REGISTER BUTTON */}
                 <IonItem >
                   <IonInput
                     type="password"
@@ -246,7 +245,7 @@ const Login = (props) => {
                   disabled={!(isUserNameValid && isEmailValid && isPasswordValid && isPhoneNumberValid)}
                   onClick={
                     // register button signup
-                   async () => {
+                    async () => {
                       const usernameSplit = loginFormState.userName.split(' ');
                       const registerRequest = {
                         //full name string split here
@@ -259,17 +258,10 @@ const Login = (props) => {
                       };
 
                       await showLoading();
-                      register(registerRequest).then((resp) => {
+                      register(registerRequest)
+                      .then((resp) => {
                         if (resp.response == "failed") {
-                          const msg = concatenateArraysAndJoin(resp.data);
-
-                          errorToast({
-                            message: msg,
-                            duration: 1500,
-                            position: "top",
-                            color: "warning"
-                          });
-
+                          throw new Error(`${resp.data}`);
 
                         } else if (resp.response == "successful") {
                           const msg = "User registered succesfully!";
@@ -282,10 +274,40 @@ const Login = (props) => {
                           });
                           // set the login token here.
                           props.setToken(resp.token);
+                          addInventoryLocation({
+                            "name": "Kitchen",
+                            "token": resp.token                        
+                          }, "POST")
+                          return resp.token;
                         }
+
+                      })
+                      .then((token) => addInventory({
+                        "items": [],
+                        "token": token
+                      }, "POST"))                     
+                      .then((resp) => {
+                        if (resp.response == "failed") {
+                          throw new Error(`${resp.data}`);
+
+                        }
+                        hideLoading();
+
+                      })                      
+                      .catch((err) => {
+                        const msg = concatenateArraysAndJoin(err.data);
+
+                        errorToast({
+                          message: msg,
+                          duration: 1500,
+                          position: "top",
+                          color: "warning"
+                        });
+                        hideLoading();
+
                       });
 
-                      await hideLoading();
+                      
 
 
 
@@ -361,6 +383,8 @@ const Login = (props) => {
                     };
 
                     await showLoading();
+
+                    
                     login(siginRequest).then((resp) => {
                       if (resp.response == "failed") {
 
@@ -386,10 +410,23 @@ const Login = (props) => {
                         });
                         // set the login token here.
                         props.setToken(resp.token);
-                        //go to home page from here?
+                        
                       }
+                      hideLoading();
+
+                    })
+                    .catch((err) => {
+                      const msg = concatenateArraysAndJoin(err.data);
+
+                      errorToast({
+                        message: msg,
+                        duration: 1500,
+                        position: "top",
+                        color: "warning"
+                      });
+
                     });
-                    await hideLoading();
+                    // await ;
 
 
 

@@ -26,6 +26,7 @@ import RecipesPage from './Recipes';
 
 const KitchenPage: React.FC = (props:any) => {
     //const token = props.token;
+    //delete props.history;
     return (            
                 <IonReactRouter>
                     <IonTabs>
@@ -34,7 +35,9 @@ const KitchenPage: React.FC = (props:any) => {
                             <Route path="/shopping" exact={true}>
                                 <IonNav rootParams={{...props, token: props.token, setToken: props.setToken }} root={(props) => <ShoppingPage {...props} />}></IonNav>    
                             </Route>
-                            <Route path="/inventory" render={(props)=><InventoryPage  token={props.token} setToken={props.setToken} {...props}/>} exact={true}/>
+                            <Route path="/inventory" exact={true}>
+                                <InventoryPage  history={history} token={props.token} setToken={props.setToken} {...props}/>
+                            </Route>
                             <Route path="/recipes" render={()=><RecipesPage />} exact={true}/>
                         </IonRouterOutlet>
                     
