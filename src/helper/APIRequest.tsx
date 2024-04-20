@@ -203,16 +203,26 @@ export async function getInventory(requestObject: any)
 /* Function for inventory page  */
 
 
-export async function addEditItems(requestObject: Object,token: String, isAdd: boolean) {
+export async function addEditItems(requestObject: Object,token: String, action: string) {
     
     let response;
     try {
 
         const endpoint = '/api/inventory/items/';
-
-
+        let method;
+        switch (action){
+            case 'add':
+                method = 'POST';
+                break;
+            case 'edit':
+                method = 'PUT';
+                break;
+            case 'remove':
+                method = 'DELETE'
+                break;
+        }
          response = await fetch(BASE_API_URL + endpoint, {
-            method: isAdd ? 'POST' : 'PUT',
+            method: method,
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Token ${token}`

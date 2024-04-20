@@ -60,7 +60,7 @@ const AddEditItemModal = (props) => {
   const [messageToast] = useIonToast();
 
 
-
+  const {showLoading: showLoading, hideLoading: hideLoading, token: token} = props
   const action = props.action;
   const editItem = action == EDIT ? props.editItem : '';
   const listItems = props.listItems;
@@ -208,7 +208,7 @@ const AddEditItemModal = (props) => {
       //full name string split here
       "name": addEditObject.itemName,
       "quantity": addEditObject.quantity,
-      "unit": addEditObject.units,
+      "units": addEditObject.units,
       "location": addEditObject.locationTab,
       "category": addEditObject.category
     };
@@ -221,8 +221,8 @@ const AddEditItemModal = (props) => {
     if (addEditObject.expirationDate) {
       addEditRequest.expiration_date = addEditObject.expirationDate;
     }
-
-    addEditItems(addEditRequest, props.token, action == ADD).then((resp) => {
+    showLoading();
+    addEditItems(addEditRequest, props.token, action).then((resp) => {
       if (resp.response == "failed") {
         const msg = concatenateArraysAndJoin(resp.data);
 
@@ -242,9 +242,13 @@ const AddEditItemModal = (props) => {
           position: "top",
           color: "success"
         });
+        // TEMPORARY: only for add, process id X in message
+        //const found = resp..match(/\d+/g);
         props.actionConfirm(action, addEditRequest);
 
       }
+
+      hideLoading();
     });
 
 
