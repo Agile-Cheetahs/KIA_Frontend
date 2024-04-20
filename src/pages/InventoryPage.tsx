@@ -11,7 +11,9 @@ import { useNavigate } from 'react-router-dom';
 
 import './InventoryPage.css';
 import {addCircle, trash, createOutline} from 'ionicons/icons';
+import { addInventoryLocation} from '../helper/APIRequest';
 import AddEditItemModal from './inventory/AddEditItemModal';
+import AddEditTabsModal from './inventory/AddEditTabsModal';1
 
 export interface InventoryItemModel{
   category:string;
@@ -111,7 +113,10 @@ let inventoryListItems = [
   quantity:1,
   unit:"g",
   location: "Cabinet"}
-]
+];
+let kitchenTabs:any = [];
+
+
 
 function InventoryItemView(props:any){
   return  <IonItem>
@@ -319,11 +324,14 @@ const InventoryPage = (props:any) => {
   const getInventoryComponent = (location) => (<Inventory errorToast={errorToast} messageToast={messageToast} inventoryItems={inventoryItems} setInventoryItems={setInventoryItems} {...props} location={location}/>);
   
   return (<IonPage>
-  <IonHeader>
-
+  <IonHeader>      
     <IonToolbar>
       <IonTitle>Inventory</IonTitle>
       <IonButtons slot="primary">
+       { <IonButton id="open-modal-tabs">          
+           <IonIcon icon={createOutline}></IonIcon>
+           <AddEditTabsModal value={kitchenTabs}></AddEditTabsModal>
+          </IonButton>    }
         <IonButton onClick={() => {
           //log out 
           logout({ token: props.token }).then((resp) => {
@@ -378,15 +386,16 @@ const InventoryPage = (props:any) => {
           <IonTabButton tab="kitchen" href='kitchen'>          
                 <IonLabel> Kitchen </IonLabel>
             </IonTabButton>
-            <IonTabButton tab="pantry" href='Pantry'>          
+            <IonTabButton tab="pantry" href='/Inventory/Pantry'>          
                 <IonLabel> Pantry </IonLabel>
             </IonTabButton>
-            <IonTabButton tab="fridge" href='Fridge'>          
+            <IonTabButton tab="fridge" href='/Inventory/Fridge'>          
                 <IonLabel> Cabinet </IonLabel>
-            </IonTabButton>            
+            </IonTabButton>                     
         </IonTabBar>        
         </IonTabs>  }    
       </IonReactRouter>
+      
     {/*<Inventory token={props.token}/> */}
   </IonContent>
 </IonPage>);

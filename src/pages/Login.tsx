@@ -21,7 +21,7 @@ import { logInOutline } from 'ionicons/icons';
 import { useState, useRef } from 'react';
 import './Login.scss';
 import { validateEmail, validatePassword, validateUsername, validateEmpty, validatePhoneNumber } from '../helper/Validation';
-import { register, login, addInventory, getInventory } from '../helper/APIRequest';
+import { register, login, addInventory, getInventory, addInventoryLocation } from '../helper/APIRequest';
 
 /* Login/Signup Landing Page
 */
@@ -274,6 +274,10 @@ const Login = (props) => {
                           });
                           // set the login token here.
                           props.setToken(resp.token);
+                          addInventoryLocation({
+                            "name": "Kitchen",
+                            "token": resp.token                        
+                          }, "POST")
                           return resp.token;
                         }
 
@@ -281,7 +285,7 @@ const Login = (props) => {
                       .then((token) => addInventory({
                         "items": [],
                         "token": token
-                      }, "POST"))
+                      }, "POST"))                     
                       .then((resp) => {
                         if (resp.response == "failed") {
                           throw new Error(`${resp.data}`);
@@ -289,7 +293,7 @@ const Login = (props) => {
                         }
                         hideLoading();
 
-                      })
+                      })                      
                       .catch((err) => {
                         const msg = concatenateArraysAndJoin(err.data);
 

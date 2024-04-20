@@ -31,6 +31,8 @@ import KitchenPage from './pages/KitchenPage';
 import ShoppingPage from './pages/shopping/ShoppingPage';
 import AddEditItemModal from './pages/inventory/AddEditItemModal';
 import Login from './pages/Login';
+import RecipesPage from './pages/Recipes';
+import AddEditTabsModal from './pages/inventory/addEditTabsModal';
 
 setupIonicReact();
 
@@ -95,12 +97,22 @@ const App: React.FC = () => {
         <Route path="/shopping" exact={true}>
           <ShoppingPage history={history} setToken={saveToken} token={token} />
         </Route>
+        {/*<Route path="/inventory" exact={true}>
+          <InventoryPage history={history} token={token} setToken={saveToken} />
+        </Route>
+        <Route path="/recipes" exact={true}>
+          <RecipesPage history={history} token={token} setToken={saveToken} />
+        </Route>
+         */}
         {/* TODO: hook following up to inventory main page item actions  */}
         <Route path="/addinventory">
           <AddEditItemModal token={token} setToken={saveToken} action={"add"} />
         </Route>
         <Route path="/editinventory">
           <AddEditItemModal editItem={item} token={token} setToken={saveToken} action={"edit"} />
+        </Route>
+        <Route path="/addEditTabs" >
+          <AddEditTabsModal token={token} setToken={saveToken} />
         </Route>
       </IonRouterOutlet>
     </IonReactRouter>

@@ -24,7 +24,7 @@ import ShoppingPage from './shopping/ShoppingPage';
 import InventoryPage from './InventoryPage';
 import RecipesPage from './Recipes';
 
-const KitchenPage: React.FC = (props) => {
+const KitchenPage: React.FC = (props:any) => {
     //const token = props.token;
     //delete props.history;
     return (            
@@ -55,10 +55,7 @@ const KitchenPage: React.FC = (props) => {
                                 <IonLabel> Recipes </IonLabel>
                             </IonTabButton>
                             
-                        </IonTabBar>                       
-                            
-                            
-                        
+                        </IonTabBar>   
                     </IonTabs>
                 </IonReactRouter>            
     );
