@@ -4,14 +4,14 @@ import { IonContent, IonHeader, IonTitle, IonToolbar, IonButton, useIonToast, Io
 import { IonReactRouter } from '@ionic/react-router';
 import { Route, Redirect } from 'react-router';
 import { search, personCircle, logOut, person } from 'ionicons/icons';
-import { getInventory,logout, concatenateArraysAndJoin, addEditItems } from '../helper/APIRequest';
+import { getInventory,logout, concatenateArraysAndJoin, addEditItems, getInventoryLocations } from '../helper/APIRequest';
 import {useState} from 'react';
 import { useNavigate } from 'react-router-dom';
 
 
 import './InventoryPage.css';
 import {addCircle, trash, createOutline} from 'ionicons/icons';
-import { addInventoryLocation} from '../helper/APIRequest';
+import { addInventoryLocation, removeInventoryLocation} from '../helper/APIRequest';
 import AddEditItemModal from './inventory/AddEditItemModal';
 import AddEditTabsModal from './inventory/AddEditTabsModal';
 
@@ -23,6 +23,11 @@ export interface InventoryItemModel{
   location:string;
   id?:any;
   expiration_date?:string;
+}
+
+export interface KitchenLocationModel{
+  locationID: number;
+  name:string;
 }
 
 
@@ -262,7 +267,7 @@ const InventoryPage = (props:any) => {
   const {showLoading: showLoading, hideLoading: hideLoading, token: token} = props
   const [inventoryId, setInventoryId] = useState(0);
   const [inventoryItems, setInventoryItems ] = useState([]);
-  const [kitchenTabs, setKitchenTabs] = useState(["Kitchen", "Cabinet"]); 
+  const [kitchenTabs, setKitchenTabs] = useState([]); 
 
   useEffect(()=> {
     //fetch inventory id and items if not found
@@ -305,6 +310,29 @@ const InventoryPage = (props:any) => {
       //  hideLoading();
 
     });
+
+    getInventoryLocations({token: props.token}).then((resp)=>{
+      if (resp.response == "failed") {
+
+
+        // merge together all response error message for a toast message.
+        const msg = concatenateArraysAndJoin(resp.data);
+
+        errorToast({
+          message: resp.detail,
+          duration: 1500,
+          position: "top",
+          color: "warning"
+        });
+
+      }
+      else if(resp.response == "successful"){
+        const locationArray = resp.data.map((location:any) =>{
+         return {locationID:location.location_id, name:location.name }
+        });
+        setKitchenTabs(locationArray);
+      }
+    });
     // .catch((err) => {
     //   const msg = concatenateArraysAndJoin(err.data);
 
@@ -326,17 +354,76 @@ const InventoryPage = (props:any) => {
   function resetItemsToKitchenLocation(tab:String)
   {
     const updatedInventory:any = inventoryItems.map((elemItem:InventoryItemModel, index)=>{
-      if(elemItem.location === tab)
-      {
-        elemItem.location = "Kitchen";
+        if(elemItem.location === tab)
+        {
+          elemItem.location = "Kitchen";
+        }
       }
-    }
    
-  );
-  
-  setInventoryItems(updatedInventory);
+    );    
+    setInventoryItems(updatedInventory);
   }
+  /**
+   * Adds a location tab after being successful from the server.  
+   * @param tab 
+   */
+  function addLocationTab(tab:any)
+  {
+    addInventoryLocation({ "name": tab[0],
+      "token": props.token                        
+    }).then((resp) => {
+      if (resp.response == "failed") {
+        const msg = concatenateArraysAndJoin(resp.data);        
+
+
+      } else if (resp.response == "successful") {
+
+        
+        const locationArray:any = [...kitchenTabs,{locationID:resp.data.location_id, name:tab[0]} ]
+        setKitchenTabs(locationArray);
+        
+      }
+    })
+  }
+
+    /**
+   * Adds a location tab after being successful from the server.  
+   * @param tab 
+   */
+  function removeLocationTab(location:KitchenLocationModel)
+    {
+      removeInventoryLocation({ 
+        "token": props.token,
+        locationID:location.locationID
+
+      }).then((resp) => {
+        if (resp.response == "failed") {
+          const msg = concatenateArraysAndJoin(resp.data);
   
+          props.errorToast({
+            message: msg,
+            duration: 1500,
+            position: "top",
+            color: "warning"
+          });
+  
+  
+        } else if (resp.response == "successful") {
+  
+          props.messageToast({
+            message: `User deleted tab succesfully!`,
+            duration: 1500,
+            position: "top",
+            color: "success"
+          });
+          let newFilterArray = props.location.setAllLocations.filter(
+            (locationModel:KitchenLocationModel) => location.locationID !== locationModel.locationID
+          );
+          setKitchenTabs(newFilterArray);
+          
+        }
+      })
+    }
   function editItemsKitchenLocation(newTab:string, oldTab:string){
     const updatedInventory:any = inventoryItems.map((elemItem:InventoryItemModel, index)=>{
       if(elemItem.location === oldTab){
@@ -356,6 +443,8 @@ const InventoryPage = (props:any) => {
        { <IonButton id="open-modal-tabs">          
            <IonIcon icon={createOutline}></IonIcon>
            <AddEditTabsModal value={kitchenTabs} 
+           removeKitchenTabFunc={removeLocationTab}
+           addKitchenTabFunc={addLocationTab}
            setKitchenTabsFunc={setKitchenTabs}
            resetItemsToKitFunc={resetItemsToKitchenLocation}
            editItemsKitchenLocation={editItemsKitchenLocation}
@@ -412,8 +501,8 @@ const InventoryPage = (props:any) => {
           {/*  render={()=> getInventoryComponent("kitchen")} */}
           {
                kitchenTabs.map((tab:any)=> 
-                <Route path={"/Inventory/"+tab} 
-               render={()=>getInventoryComponent(tab)} exact={true}/>
+                <Route path={"/Inventory/"+tab.name} 
+               render={()=>getInventoryComponent(tab.name)} exact={true}/>
               )
           }
 
@@ -425,8 +514,8 @@ const InventoryPage = (props:any) => {
           <IonTabBar slot="top">                       
             {
               kitchenTabs.map((tab:any)=>
-                <IonTabButton tab={tab} href={'/Inventory/' + tab}>
-                  <IonLabel>{tab}</IonLabel>
+                <IonTabButton tab={tab.name} href={'/Inventory/' + tab.name}>
+                  <IonLabel>{tab.name}</IonLabel>
                 </IonTabButton>
               )
           }

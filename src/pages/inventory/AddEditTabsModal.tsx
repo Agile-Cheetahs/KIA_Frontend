@@ -20,6 +20,9 @@ import {
   } from '@ionic/react';
   import { OverlayEventDetail } from '@ionic/core/components';
   import { addCircle, arrowDown,arrowUp, trash} from 'ionicons/icons';
+  import { addInventoryLocation} from '../../helper/APIRequest';
+
+  import {KitchenLocationModel} from '../InventoryPage'
 
   function TabEditItemView(props:any){
     
@@ -68,12 +71,13 @@ import {
         {
             return (<IonButton onClick={()=>{
                 
-                let newFilterArray = props.location.setAllLocations.filter(
+               /* let newFilterArray = props.location.setAllLocations.filter(
                     (tabString:string, index:number) => props.index !== index
-                );
-                props.location.resetItemsToKitFunc(props.location.locationName);
+                );*/
+                props.location.resetItemsToKitFunc(props.locationName);
                 //Set the Kitchen tabs with new smaller array.  
-                props.location.setKitchenTabsFunc(newFilterArray);            
+                //props.location.setKitchenTabsFunc(newFilterArray);            
+                props.location.removeKitchenTabFunc(props.locationModel);
             }}>
                 <IonIcon icon={trash}/>
                  </IonButton>);
@@ -108,14 +112,13 @@ import {
         props.editItemsKitFunc(props.locationName,e.target.value);
         props.setKitchenTabsFunc(newReplaceArray); 
        }
-        
-        
         }
        >
        </IonInput>     
       
        {/*Delete Tab Button */}
-       <TrashButton index={props.index} location={props}></TrashButton>
+       <TrashButton index={props.index} locationName={props.locationName} 
+       locationModel={props.locationModel} location={props} ></TrashButton>
     </IonItem>
     )
   }
@@ -140,7 +143,9 @@ import {
     function onAddTab(props:any){
         if(props.tabInput != "")
         {
-            props.setKitchenTabsFunc([...props.kitchenLocations,props.tabInput]);
+          //TODO
+            //props.setKitchenTabsFunc([...props.kitchenLocations,props.tabInput]);
+            props.addKitchenTabFunc([props.tabInput]);
         }
         
     }
@@ -158,16 +163,18 @@ import {
                     Kitchen Locations
                 </IonListHeader>
                 {
-                    kitchenLocations.map((location:string, tabIndex:number, allLocations:any) => 
-                    <TabEditItemView locationName={location} 
+                    kitchenLocations.map((location:KitchenLocationModel, tabIndex:number, allLocations:any) => 
+                    <TabEditItemView locationName={location.name} 
                     index={tabIndex} 
                     isLast={allLocations.length - 1 == tabIndex}
                     setAllLocations={props.value}
+                    removeKitchenTabFunc = {props.removeKitchenTabFunc}
                     setKitchenTabsFunc = {props.setKitchenTabsFunc}
                     resetItemsToKitFunc = {props.resetItemsToKitFunc}
                     editItemsKitFunc = {props.editItemsKitchenLocation}
+                    locationModel = {location}
                     >
-                        </TabEditItemView>)
+                    </TabEditItemView>)
                 }
                 <IonItem>
                     <IonInput                    
@@ -182,7 +189,7 @@ import {
                     </IonInput>
                     <IonButton onClick={()=>onAddTab({tabInput:newTabInput, 
                         kitchenLocations:props.value,
-                         setKitchenTabsFunc:props.setKitchenTabsFunc})}>
+                         addKitchenTabFunc:props.addKitchenTabFunc})}>
                         <IonIcon icon={addCircle}/>
                     </IonButton>                    
                 </IonItem>
