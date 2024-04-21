@@ -38,7 +38,7 @@ const KitchenPage: React.FC = (props:any) => {
                             <Route path="/inventory" exact={true}>
                                 <InventoryPage  history={history} token={props.token} setToken={props.setToken} {...props}/>
                             </Route>
-                            <Route path="/recipes" render={()=><RecipesPage />} exact={true}/>
+                            
                         </IonRouterOutlet>
                     
                         <IonTabBar slot="bottom">
@@ -50,10 +50,7 @@ const KitchenPage: React.FC = (props:any) => {
                                 <IonIcon icon={cart} />
                                 <IonLabel> Shopping </IonLabel>
                             </IonTabButton>
-                            <IonTabButton tab="recipes" href='/recipes'>
-                                <IonIcon icon={book} />
-                                <IonLabel> Recipes </IonLabel>
-                            </IonTabButton>
+                            
                             
                         </IonTabBar>   
                     </IonTabs>

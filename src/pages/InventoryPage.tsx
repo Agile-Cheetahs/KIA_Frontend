@@ -61,7 +61,7 @@ let inventoryListItems = [
   unit:"g",
   location: "Cabinet"}
 ];
-let kitchenTabs = ["Kitchen", "Cabinet"];
+
 
 
 function InventoryItemView(props:any){
@@ -98,7 +98,8 @@ function InventoryItemView(props:any){
 }
 
 function Inventory(props:any)
-{  
+{
+   
   const addItemToList = (action: string, item: InventoryItemModel) => {
     if (action == "add") {
 
@@ -177,6 +178,7 @@ const InventoryPage = (props:any) => {
   const {showLoading: showLoading, hideLoading: hideLoading, token: token} = props
   const [inventoryId, setInventoryId] = useState(0);
   const [inventoryItems, setInventoryItems ] = useState([]);
+  const [kitchenTabs, setKitchenTabs] = useState(["Kitchen", "Cabinet"]); 
 
   useEffect(()=> {
     //fetch inventory id and items if not found
@@ -233,8 +235,32 @@ const InventoryPage = (props:any) => {
 
   }, [token])
 
-  
+  /**
+   * Changes all of the items in this tab to use Kitchen.  
+   * @param tab 
+   */
+  function resetItemsToKitchenLocation(tab:String)
+  {
+    const updatedInventory:any = inventoryItems.map((elemItem:InventoryItemModel, index)=>{
+      if(elemItem.location === tab)
+      {
+        elemItem.location = "Kitchen";
+      }
+    }
    
+  );
+  
+  setInventoryItems(updatedInventory);
+  }
+  
+  function editItemsKitchenLocation(newTab:string, oldTab:string){
+    const updatedInventory:any = inventoryItems.map((elemItem:InventoryItemModel, index)=>{
+      if(elemItem.location === oldTab){
+        elemItem.location = newTab;
+      }
+    });
+    setInventoryItems(updatedInventory);
+  }
   
   const getInventoryComponent = (location:any) => (<Inventory inventoryItems={inventoryItems} setInventoryItems={setInventoryItems} token={props.token} location={location}/>);
   
@@ -245,7 +271,13 @@ const InventoryPage = (props:any) => {
       <IonButtons slot="primary">
        { <IonButton id="open-modal-tabs">          
            <IonIcon icon={createOutline}></IonIcon>
-           <AddEditTabsModal value={kitchenTabs}></AddEditTabsModal>
+           <AddEditTabsModal value={kitchenTabs} 
+           setKitchenTabsFunc={setKitchenTabs}
+           resetItemsToKitFunc={resetItemsToKitchenLocation}
+           editItemsKitchenLocation={editItemsKitchenLocation}
+           >
+
+           </AddEditTabsModal>
           </IonButton>    }
         <IonButton onClick={() => {
           //log out 
@@ -303,9 +335,17 @@ const InventoryPage = (props:any) => {
           <IonRouterOutlet>         
           {<Redirect exact path="/inventory" to="/Inventory/Kitchen"/>}
           {/*  render={()=> getInventoryComponent("kitchen")} */}
-          <Route path="/Inventory/Kitchen"  render={()=> getInventoryComponent("kitchen")}  exact={true}/>              
+          {
+               kitchenTabs.map((tab:any)=> 
+                <Route path={"/Inventory/"+tab} 
+               render={()=>getInventoryComponent(tab)} exact={true}/>
+              )
+          }
+
+          {/*<Route path="/Inventory/Kitchen"  render={()=> getInventoryComponent("kitchen")}  exact={true}/>              
                 <Route path="/Inventory/Cabinet" render={()=> getInventoryComponent("Cabinet")} exact={true}/>              
                 <Route path="/Inventory/Pantry" render={()=> getInventoryComponent("Pantry")} exact={true}/>  
+           */}
             </IonRouterOutlet>
           <IonTabBar slot="top">                       
             {

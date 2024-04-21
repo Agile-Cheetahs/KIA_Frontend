@@ -58,14 +58,23 @@ import {
             return <></>
         }
     }
-
+    /**
+     * Trash Button
+     * @param props 
+     * @returns 
+     */
     function TrashButton(props:any){
         if(props.index > 0)
         {
             return (<IonButton onClick={()=>{
-                props.setLocation(props.setLocation.setAllLocations.filter(
-                (tabString:string, index:number) => props.index !== index
-            ))}}>
+                
+                let newFilterArray = props.location.setAllLocations.filter(
+                    (tabString:string, index:number) => props.index !== index
+                );
+                props.location.resetItemsToKitFunc(props.location.locationName);
+                //Set the Kitchen tabs with new smaller array.  
+                props.location.setKitchenTabsFunc(newFilterArray);            
+            }}>
                 <IonIcon icon={trash}/>
                  </IonButton>);
         }
@@ -82,21 +91,44 @@ import {
        label={props.index} 
        placeholder="Location Name" 
        value={props.locationName} 
-       disabled={props.index==0} >
+       disabled={props.index==0} 
+       onIonChange={(e)=> {
+        /**
+         * Updating the tab name when being edited.  
+         */
+        let newReplaceArray = props.setAllLocations.map((elem:any, index:number) =>{
+            if(index == props.index)
+            {
+                    return e.target.value;
+            }
+            else{
+                return elem;
+            }
+        })
+        props.editItemsKitFunc(props.locationName,e.target.value);
+        props.setKitchenTabsFunc(newReplaceArray); 
+       }
+        
+        
+        }
+       >
        </IonInput>     
       
        {/*Delete Tab Button */}
-       <TrashButton index={props.index} setLocation={props}></TrashButton>
+       <TrashButton index={props.index} location={props}></TrashButton>
     </IonItem>
     )
   }
 
+ 
+
   const AddEditTabsModal = (props:any) => {
     const modal = useRef<HTMLIonModalElement>(null);
     const input = useRef<HTMLIonInputElement>(null);
+    const [newTabInput, setTabInput] = useState('');
     
     let kitchenLocations = props.value;
-
+    
     function confirm() {
         modal.current?.dismiss(input.current?.value, 'confirm');
       }
@@ -105,6 +137,13 @@ import {
          // ('', itemState);
         }
       }
+    function onAddTab(props:any){
+        if(props.tabInput != "")
+        {
+            props.setKitchenTabsFunc([...props.kitchenLocations,props.tabInput]);
+        }
+        
+    }
     
     return(
        <IonModal ref={modal} trigger="open-modal-tabs" onWillDismiss={(ev) => onWillDismiss(ev)}>
@@ -120,17 +159,30 @@ import {
                 </IonListHeader>
                 {
                     kitchenLocations.map((location:string, tabIndex:number, allLocations:any) => 
-                    <TabEditItemView locationName={location} index={tabIndex} isLast={allLocations.length - 1 == tabIndex} setAllLocations={props.value}>
+                    <TabEditItemView locationName={location} 
+                    index={tabIndex} 
+                    isLast={allLocations.length - 1 == tabIndex}
+                    setAllLocations={props.value}
+                    setKitchenTabsFunc = {props.setKitchenTabsFunc}
+                    resetItemsToKitFunc = {props.resetItemsToKitFunc}
+                    editItemsKitFunc = {props.editItemsKitchenLocation}
+                    >
                         </TabEditItemView>)
                 }
                 <IonItem>
-                    <IonInput
+                    <IonInput                    
                     type="text" 
                     label="New Tab:" 
-                    placeholder="Location Name" >
+                    placeholder="Location Name"
+                    value={newTabInput}
+                    onIonInput={(e)=> setTabInput((e.target as HTMLInputElement).value)}
+                    >
+                    
                         
                     </IonInput>
-                    <IonButton>
+                    <IonButton onClick={()=>onAddTab({tabInput:newTabInput, 
+                        kitchenLocations:props.value,
+                         setKitchenTabsFunc:props.setKitchenTabsFunc})}>
                         <IonIcon icon={addCircle}/>
                     </IonButton>                    
                 </IonItem>
