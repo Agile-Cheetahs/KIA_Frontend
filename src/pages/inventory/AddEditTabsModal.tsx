@@ -97,19 +97,21 @@ import {
        value={props.locationName} 
        disabled={props.index==0} 
        onIonChange={(e)=> {
+       let changingLocationID=0;
         /**
          * Updating the tab name when being edited.  
          */
         let newReplaceArray = props.setAllLocations.map((elem:any, index:number) =>{
             if(index == props.index)
             {
-                    return e.target.value;
+                changingLocationID = elem.locationID;
+                    return {locationID:elem.locationID, name:e.target.value};
             }
             else{
                 return elem;
             }
         })
-        props.editItemsKitFunc(props.locationName,e.target.value);
+        props.editItemsKitFunc(changingLocationID, e.target.value, props.locationName);
         props.setKitchenTabsFunc(newReplaceArray); 
        }
         }

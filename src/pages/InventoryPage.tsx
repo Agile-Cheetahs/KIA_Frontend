@@ -11,7 +11,7 @@ import { useNavigate } from 'react-router-dom';
 
 import './InventoryPage.css';
 import {addCircle, trash, createOutline} from 'ionicons/icons';
-import { addInventoryLocation, removeInventoryLocation} from '../helper/APIRequest';
+import { addInventoryLocation, removeInventoryLocation, editInventoryTab} from '../helper/APIRequest';
 import AddEditItemModal from './inventory/AddEditItemModal';
 import AddEditTabsModal from './inventory/AddEditTabsModal';
 
@@ -392,30 +392,19 @@ const InventoryPage = (props:any) => {
    */
   function removeLocationTab(location:KitchenLocationModel)
     {
-      removeInventoryLocation({ 
-        "token": props.token,
-        locationID:location.locationID
+      removeInventoryLocation({         
+        "name": location.name
+        //locationID:location.locationID
 
-      }).then((resp) => {
+      },props.token, location.locationID).then((resp) => {
         if (resp.response == "failed") {
           const msg = concatenateArraysAndJoin(resp.data);
   
-          props.errorToast({
-            message: msg,
-            duration: 1500,
-            position: "top",
-            color: "warning"
-          });
+        
   
   
-        } else if (resp.response == "successful") {
-  
-          props.messageToast({
-            message: `User deleted tab succesfully!`,
-            duration: 1500,
-            position: "top",
-            color: "success"
-          });
+        } else if (resp.response == "successful") {  
+        
           let newFilterArray = props.location.setAllLocations.filter(
             (locationModel:KitchenLocationModel) => location.locationID !== locationModel.locationID
           );
@@ -424,13 +413,29 @@ const InventoryPage = (props:any) => {
         }
       })
     }
-  function editItemsKitchenLocation(newTab:string, oldTab:string){
-    const updatedInventory:any = inventoryItems.map((elemItem:InventoryItemModel, index)=>{
-      if(elemItem.location === oldTab){
-        elemItem.location = newTab;
-      }
-    });
-    setInventoryItems(updatedInventory);
+  function editItemsKitchenLocation(changingLocationID:any, newTab:string, oldTab:string){
+
+    editInventoryTab({name:newTab},changingLocationID, props.token, "PUT" ).then((resp) => {
+      if (resp.response == "failed") {
+        const msg = concatenateArraysAndJoin(resp.data);
+
+      
+
+
+      } else if (resp.response == "successful") {  
+      
+        const updatedInventory:any = inventoryItems.map((elemItem:InventoryItemModel, index)=>{
+          if(elemItem.location === oldTab){
+            elemItem.location = newTab;
+          }
+        });
+        setInventoryItems(updatedInventory);
+      }      
+     })
+      
+    
+    
+    
   }
   
   const getInventoryComponent = (location:any) => (<Inventory inventoryItems={inventoryItems} setInventoryItems={setInventoryItems} token={props.token} location={location}/>);

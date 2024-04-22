@@ -162,11 +162,11 @@ export async function addInventoryLocation(requestObject: any)
         return { response: "failed", status: error.msg, data: data};
     }
 }
-export async function removeInventoryLocation(requestObject: any)
+export async function removeInventoryLocation(requestObject: any,token:string, locationID:any)
 {
     let response;
-    let token = requestObject.token
-    let locationID = requestObject.locationID;
+    //let token = requestObject.token
+    //let locationID = requestObject.locationID;
     //delete requestObject.token 
     
     try {
@@ -189,7 +189,7 @@ export async function removeInventoryLocation(requestObject: any)
             throw new Error(`HTTP error! status: ${response.status}`);
         }
         // Parse the JSON response
-        const data = await response.json();
+        const data = {}
 
         // Return the data
         return {...data, response: "successful"};
@@ -203,15 +203,15 @@ export async function removeInventoryLocation(requestObject: any)
     }
 }
 
-export async function editInventoryTab(requestObject: any, method: string)
+export async function editInventoryTab(requestObject: any,locationID:any,  token:any, method: string)
 {
     let response;
-    let token = requestObject.token
+    //let token = requestObject.token
    // delete requestObject.token 
     
     try {
 
-        const endpoint = '/api/inventory/locations/';
+        const endpoint = '/api/inventory/locations/?id='+locationID;
 
 
          response = await fetch(BASE_API_URL + endpoint, {
