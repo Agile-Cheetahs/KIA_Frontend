@@ -274,10 +274,10 @@ const Login = (props) => {
                           });
                           // set the login token here.
                           props.setToken(resp.token);
-                          addInventoryLocation({
+                          /*addInventoryLocation({
                             "name": "Kitchen",
                             "token": resp.token                        
-                          }, "POST")
+                          }, "POST")*/
                           return resp.token;
                         }
 

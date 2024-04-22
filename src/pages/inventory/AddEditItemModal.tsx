@@ -220,7 +220,7 @@ const AddEditItemModal = (props) => {
     if (addEditObject.expiration_date) {
       addEditRequest.expiration_date = addEditObject.expiration_date;
     }
-    showLoading();
+    //showLoading();
     addEditItems(addEditRequest, props.token, action).then((resp) => {
       if (resp.response == "failed") {
         const msg = concatenateArraysAndJoin(resp.data);
@@ -254,7 +254,7 @@ const AddEditItemModal = (props) => {
 
       }
 
-      hideLoading();
+     // hideLoading();
     });
 
 

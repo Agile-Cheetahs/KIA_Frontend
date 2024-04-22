@@ -20,6 +20,9 @@ import {
   } from '@ionic/react';
   import { OverlayEventDetail } from '@ionic/core/components';
   import { addCircle, arrowDown,arrowUp, trash} from 'ionicons/icons';
+  import { addInventoryLocation} from '../../helper/APIRequest';
+
+  import {KitchenLocationModel} from '../InventoryPage'
 
   function TabEditItemView(props:any){
     
@@ -58,14 +61,24 @@ import {
             return <></>
         }
     }
-
+    /**
+     * Trash Button
+     * @param props 
+     * @returns 
+     */
     function TrashButton(props:any){
         if(props.index > 0)
         {
             return (<IonButton onClick={()=>{
-                props.setLocation(props.setLocation.setAllLocations.filter(
-                (tabString:string, index:number) => props.index !== index
-            ))}}>
+                
+               /* let newFilterArray = props.location.setAllLocations.filter(
+                    (tabString:string, index:number) => props.index !== index
+                );*/
+                props.location.resetItemsToKitFunc(props.locationName);
+                //Set the Kitchen tabs with new smaller array.  
+                //props.location.setKitchenTabsFunc(newFilterArray);            
+                props.location.removeKitchenTabFunc(props.locationModel);
+            }}>
                 <IonIcon icon={trash}/>
                  </IonButton>);
         }
@@ -82,21 +95,43 @@ import {
        label={props.index} 
        placeholder="Location Name" 
        value={props.locationName} 
-       disabled={props.index==0} >
+       disabled={props.index==0} 
+       onIonChange={(e)=> {
+        /**
+         * Updating the tab name when being edited.  
+         */
+        let newReplaceArray = props.setAllLocations.map((elem:any, index:number) =>{
+            if(index == props.index)
+            {
+                    return e.target.value;
+            }
+            else{
+                return elem;
+            }
+        })
+        props.editItemsKitFunc(props.locationName,e.target.value);
+        props.setKitchenTabsFunc(newReplaceArray); 
+       }
+        }
+       >
        </IonInput>     
       
        {/*Delete Tab Button */}
-       <TrashButton index={props.index} setLocation={props}></TrashButton>
+       <TrashButton index={props.index} locationName={props.locationName} 
+       locationModel={props.locationModel} location={props} ></TrashButton>
     </IonItem>
     )
   }
 
+ 
+
   const AddEditTabsModal = (props:any) => {
     const modal = useRef<HTMLIonModalElement>(null);
     const input = useRef<HTMLIonInputElement>(null);
+    const [newTabInput, setTabInput] = useState('');
     
     let kitchenLocations = props.value;
-
+    
     function confirm() {
         modal.current?.dismiss(input.current?.value, 'confirm');
       }
@@ -105,6 +140,15 @@ import {
          // ('', itemState);
         }
       }
+    function onAddTab(props:any){
+        if(props.tabInput != "")
+        {
+          //TODO
+            //props.setKitchenTabsFunc([...props.kitchenLocations,props.tabInput]);
+            props.addKitchenTabFunc([props.tabInput]);
+        }
+        
+    }
     
     return(
        <IonModal ref={modal} trigger="open-modal-tabs" onWillDismiss={(ev) => onWillDismiss(ev)}>
@@ -119,18 +163,33 @@ import {
                     Kitchen Locations
                 </IonListHeader>
                 {
-                    kitchenLocations.map((location:string, tabIndex:number, allLocations:any) => 
-                    <TabEditItemView locationName={location} index={tabIndex} isLast={allLocations.length - 1 == tabIndex} setAllLocations={props.value}>
-                        </TabEditItemView>)
+                    kitchenLocations.map((location:KitchenLocationModel, tabIndex:number, allLocations:any) => 
+                    <TabEditItemView locationName={location.name} 
+                    index={tabIndex} 
+                    isLast={allLocations.length - 1 == tabIndex}
+                    setAllLocations={props.value}
+                    removeKitchenTabFunc = {props.removeKitchenTabFunc}
+                    setKitchenTabsFunc = {props.setKitchenTabsFunc}
+                    resetItemsToKitFunc = {props.resetItemsToKitFunc}
+                    editItemsKitFunc = {props.editItemsKitchenLocation}
+                    locationModel = {location}
+                    >
+                    </TabEditItemView>)
                 }
                 <IonItem>
-                    <IonInput
+                    <IonInput                    
                     type="text" 
                     label="New Tab:" 
-                    placeholder="Location Name" >
+                    placeholder="Location Name"
+                    value={newTabInput}
+                    onIonInput={(e)=> setTabInput((e.target as HTMLInputElement).value)}
+                    >
+                    
                         
                     </IonInput>
-                    <IonButton>
+                    <IonButton onClick={()=>onAddTab({tabInput:newTabInput, 
+                        kitchenLocations:props.value,
+                         addKitchenTabFunc:props.addKitchenTabFunc})}>
                         <IonIcon icon={addCircle}/>
                     </IonButton>                    
                 </IonItem>

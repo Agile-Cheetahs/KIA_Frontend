@@ -123,7 +123,8 @@ export async function logout(requestObject: any) {
     }
 }
 
-export async function addInventoryLocation(requestObject: any, method: string) {
+export async function addInventoryLocation(requestObject: any)
+{
     let response;
     let token = requestObject.token
     //delete requestObject.token 
@@ -151,7 +152,47 @@ export async function addInventoryLocation(requestObject: any, method: string) {
         const data = await response.json();
 
         // Return the data
-        return { ...data, response: "successful" };
+        return {data:data, response: "successful"};
+
+    }
+    catch (error : any) {
+        // Log any errors to the console
+        console.error("There has been a problem with your fetch operation:", error);
+        const data = await response.json();
+        return { response: "failed", status: error.msg, data: data};
+    }
+}
+export async function removeInventoryLocation(requestObject: any)
+{
+    let response;
+    let token = requestObject.token
+    let locationID = requestObject.locationID;
+    //delete requestObject.token 
+    
+    try {
+
+        const endpoint = '/api/inventory/locations/?id=' + locationID;
+
+
+         response = await fetch(BASE_API_URL + endpoint, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Token ${token}`
+            },
+            //  credentials: "include",
+            body: JSON.stringify(requestObject),
+        });
+
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        // Parse the JSON response
+        const data = await response.json();
+
+        // Return the data
+        return {...data, response: "successful"};
 
     }
     catch (error: any) {
@@ -201,8 +242,9 @@ export async function editInventoryTab(requestObject: any, method: string) {
     }
 }
 
-export async function getInventoryLocations(requestObject: any, method: string) {
-    let response;
+export async function getInventoryLocations(requestObject: any)
+{
+    let response:any;
     let token = requestObject.token
     // delete requestObject.token 
 
@@ -229,7 +271,7 @@ export async function getInventoryLocations(requestObject: any, method: string) 
         const data = await response.json();
 
         // Return the data
-        return { ...data, response: "successful" };
+        return {data:data, response: "successful"};
 
     }
     catch (error: any) {
