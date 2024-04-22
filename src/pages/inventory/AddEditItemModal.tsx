@@ -38,13 +38,13 @@ let validationMethodMap = {
   "itemName": validateItemName,
   "quantity": validateNumber,
   "units": validateUnits,
-  "locationTab": validateOptionalSelectText,
+  "location": validateOptionalSelectText,
   "category": validateOptionalSelectText,
-  "expirationDate": validateExpDateWrapper
+  "expiration_date": validateExpDateWrapper
 }
 
 let errorLabels = {
-  "expirationDate": "Date should be today or in future"
+  "expiration_date": "Date should be today or in future"
 }
 
 
@@ -77,10 +77,7 @@ const AddEditItemModal = (props) => {
     { id: 3, name: "Cabinet" }
     ]// props.locationTabList;
   const categoryList = [{ id: 1, name: "Fruit" },
-  { id: 2, name: "Grocery" },
-  { id: 3, name: "Water" },
-  { id: 4, name: "Ice" },
-  { id: 5, name: "Cereal" }
+  { id: 2, name: "Grocery" }
   ]
   //props.categoryList;
   const unitTypes = [{ id: 1, name: "count" },
@@ -112,10 +109,10 @@ const AddEditItemModal = (props) => {
   const emptyItemState = {
     "itemName": action == EDIT ? editItem.name : "", // TODO: edit item payload used to populate these values
     "quantity": action == EDIT ? editItem.quantity : "",
-    "units": action == EDIT ? editItem.unit : "count",
-    "locationTab": action == EDIT ? editItem.location : "Pantry",
+    "units": action == EDIT ? editItem.units : "count",
+    "location": action == EDIT ? editItem.location : "Kitchen",
     "category": action == EDIT ? editItem.category : "Grocery",
-    "expirationDate": action == EDIT ? editItem.expirationDate : ""
+    "expiration_date": action == EDIT ? editItem.expiration_date : ""
   };
   const [itemState, setItemState] = useState(emptyItemState);
 
@@ -123,9 +120,11 @@ const AddEditItemModal = (props) => {
     // when modal is opened after mounting, update state after validation
         setIsItemNameValid(action == EDIT);
         setIsQuantityValid(action == EDIT);
+
+        setItemState(emptyItemState);
     
   }, 
-  [props.action]
+  [props.editItem]
   );
 
 
@@ -136,9 +135,9 @@ const AddEditItemModal = (props) => {
     "itemName": [isItemNameValid, setIsItemNameValid, isUserNameTouched, setIsUserNameTouched],
     "quantity": [isQuantityValid, setIsQuantityValid, isQuantityTouched, setIsQuantityTouched],
     "units": [isUnitsValid, setIsUnitsValid, isUnitsTouched, setIsUnitsTouched],
-    "locationTab": [isLocationTabValid, setIsLocationTabValid, isLocationTabTouched, setLocationTabTouched],
+    "location": [isLocationTabValid, setIsLocationTabValid, isLocationTabTouched, setLocationTabTouched],
     "category": [isCategoryValid, setIsCategoryValid, isCategoryTouched, setIsCategoryTouched],
-    "expirationDate": [isExpirationDateValid, setIsExpirationDateValid, isExpirationDateTouched, setExpirationDateTouched]
+    "expiration_date": [isExpirationDateValid, setIsExpirationDateValid, isExpirationDateTouched, setExpirationDateTouched]
   }
 
   // JUST use THE fieldname directly...
@@ -146,9 +145,9 @@ const AddEditItemModal = (props) => {
   //   "Name": validateEmpty,
   //   "Quantity": validateEmpty,
   //   "Units": validateEmpty,
-  //   "LocationTab": validateEmpty,
+  //   "location": validateEmpty,
   //   "Category": validateEmpty,
-  //   "ExpirationDate": validateEmpty
+  //   "expiration_date": validateEmpty
   // }
   const formInputClassName = (fieldName: string) => {
     const validateField = inputFieldStateMap[fieldName][0];
@@ -168,9 +167,9 @@ const AddEditItemModal = (props) => {
 
 
     // log statements
-    console.log(fieldName);
-    console.log(validateMethod);
-    console.log(validateSetter);
+    // console.log(fieldName);
+    // console.log(validateMethod);
+    // console.log(validateSetter);
 
 
     // if (value === '') return;
@@ -209,7 +208,7 @@ const AddEditItemModal = (props) => {
       "name": addEditObject.itemName,
       "quantity": addEditObject.quantity,
       "units": addEditObject.units,
-      "location": addEditObject.locationTab,
+      "location": addEditObject.location,
       "category": addEditObject.category
     };
 
@@ -218,8 +217,8 @@ const AddEditItemModal = (props) => {
       addEditRequest.id = editItem.id;
     }
 
-    if (addEditObject.expirationDate) {
-      addEditRequest.expiration_date = addEditObject.expirationDate;
+    if (addEditObject.expiration_date) {
+      addEditRequest.expiration_date = addEditObject.expiration_date;
     }
     showLoading();
     addEditItems(addEditRequest, props.token, action).then((resp) => {
@@ -243,7 +242,14 @@ const AddEditItemModal = (props) => {
           color: "success"
         });
         // TEMPORARY: only for add, process id X in message
-        //const found = resp..match(/\d+/g);
+        if (action == ADD) {
+          const list = Object.keys(resp).map(function(k) { return  resp[k] });
+          list.pop();
+          const message : string = list.join('');
+          addEditRequest.id = Number(message.match(/\d+/g)[0]);
+          // addEditRequest.expiration_date  = addEditRequest.expiration_date;
+        }
+        
         props.actionConfirm(action, addEditRequest);
 
       }
@@ -296,9 +302,9 @@ const AddEditItemModal = (props) => {
           {/*    "itemName": "",
     "quantity": "",
     "units": "",
-    "locationTab": "",
+    "location": "",
     "category": "",
-    "expirationDate": "" */}
+    "expiration_date": "" */}
           <IonInput
             type="text"
             className={formInputClassName("itemName")}
@@ -354,12 +360,12 @@ const AddEditItemModal = (props) => {
           <IonSelect
             aria-label="Location"
             interface="popover"
-            label="locationTab"
-            className={formInputClassName("locationTab")}
-            value={itemState.locationTab}
+            label="location"
+            className={formInputClassName("location")}
+            value={itemState.location}
             //compareWith={compareSelectItems}
-            onIonChange={(event) => { setItemState((state) => { return { ...itemState, locationTab: state }; }); validate(event); }}
-            onIonBlur={() => inputFieldStateMap["locationTab"][3](true)}
+            onIonChange={(event) => { setItemState((state) => { return { ...itemState, location: state }; }); validate(event); }}
+            onIonBlur={() => inputFieldStateMap["location"][3](true)}
             onIonCancel={() => console.log('ionCancel fired')}
             onIonDismiss={() => console.log('ionDismiss fired')}
             placeholder="Select location tab">
@@ -395,15 +401,15 @@ const AddEditItemModal = (props) => {
         <IonItem >
           <IonInput
             type="date"
-            className={formInputClassName("expirationDate")}
-            label="expirationDate"
+            className={formInputClassName("expiration_date")}
+            label="expiration_date"
             clearOnEdit={false}
             label-placement="stacked"
-            value={itemState.expirationDate}
+            value={itemState.expiration_date}
             helperText=""
-            errorText={errorLabels["expirationDate"]}
-            onIonBlur={() => inputFieldStateMap["expirationDate"][3](true)}
-            onIonChange={(event) => { setItemState((state) => { return { ...itemState, expirationDate: state }; }); validate(event); }}
+            errorText={errorLabels["expiration_date"]}
+            onIonBlur={() => inputFieldStateMap["expiration_date"][3](true)}
+            onIonChange={(event) => { setItemState((state) => { return { ...itemState, expiration_date: state }; }); validate(event); }}
           ></IonInput>
         </IonItem>
       </IonContent>

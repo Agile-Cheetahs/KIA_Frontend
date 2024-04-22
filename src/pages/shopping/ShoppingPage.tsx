@@ -240,6 +240,7 @@ function ShoppingPageMain(props: any) {
             is_complete: false,
             itemList: []
           }
+          
           dispatch(newitem);
           // props.history.push(`/shoppinglist/${newitem.id}`);
 
@@ -378,7 +379,7 @@ const ShoppingPage = (props: any) => {
 
     </IonHeader>
     <IonContent>
-    <ShoppingPageMain shoppingLists={lists} dispatch={dispatch} token={props.token} setToken={props.setToken}></ShoppingPageMain>
+    <ShoppingPageMain shoppingLists={lists} dispatch={dispatch} token={props.token} setToken={props.setToken} {...props}></ShoppingPageMain>
       {/* <IonReactRouter>
         {
           <IonRouterOutlet>

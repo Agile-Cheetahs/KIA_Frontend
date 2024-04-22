@@ -1,7 +1,8 @@
 
 import {
   IonContent, IonHeader, IonSelect, IonInput, IonSelectOption, IonToolbar, IonButton, IonPage, IonButtons, IonIcon,
-  IonLabel, IonBackButton, IonCheckbox, IonList, IonItem, IonListHeader, IonFooter, IonCol, IonGrid, IonRow, IonCard, IonCardContent, IonCardTitle, IonCardSubtitle, IonCardHeader
+  IonLabel, IonBackButton, IonCheckbox, IonList, IonItem, IonListHeader, IonFooter, IonCol, IonGrid, IonRow, IonCard, IonCardContent, IonCardTitle, IonCardSubtitle, IonCardHeader,
+  IonTitle
 } from '@ionic/react';
 
 import {
@@ -181,7 +182,7 @@ const ShoppingList = (props) => {
           <IonButtons slot="start">
             <IonBackButton defaultHref="/shopping"></IonBackButton>
           </IonButtons>
-
+          <IonTitle>{name}</IonTitle>
         </IonToolbar>
       </IonHeader>
       <IonContent className="ion-padding">
@@ -207,8 +208,8 @@ const ShoppingList = (props) => {
                 <IonCardContent>
                   <IonGrid class="ion-justify-content-between">
                     <IonRow class="ion-align-self-center">
-                      <IonCol size="auto">{item.quantity + " "}</IonCol>
-                      <IonCol size="auto">{item.unit} </IonCol>
+                      <IonCol >{item.quantity + " "}</IonCol>
+                      <IonCol >{item.unit} </IonCol>
                       <IonCol class="ion-align-items-end">
                         <IonButton  id={"edit-item-" + item.id} className="edit-item" onClick={() => {
 

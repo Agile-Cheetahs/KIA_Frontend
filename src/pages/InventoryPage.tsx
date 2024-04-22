@@ -378,12 +378,12 @@ const InventoryPage = (props:any) => {
         {<IonTabs>
           <IonRouterOutlet>         
  
-          <Route path="kitchen"  render={()=> getInventoryComponent("kitchen")}  exact={true}/>              
+          <Route path="Kitchen"  render={()=> getInventoryComponent("Kitchen")}  exact={true}/>              
                 <Route path="Fridge" render={()=> getInventoryComponent("Cabinet")} exact={true}/>              
                 <Route path="Pantry" render={()=> getInventoryComponent("Pantry")} exact={true}/>  
             </IonRouterOutlet>
           <IonTabBar slot="top">
-          <IonTabButton tab="kitchen" href='kitchen'>          
+          <IonTabButton tab="kitchen" href='Kitchen'>          
                 <IonLabel> Kitchen </IonLabel>
             </IonTabButton>
             <IonTabButton tab="pantry" href='Pantry'>          

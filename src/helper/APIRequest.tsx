@@ -322,32 +322,44 @@ export async function addEditItems(requestObject: Object, token: String, action:
     let response;
     try {
 
-        const endpoint = '/api/inventory/items/';
+        let endpoint = '/api/inventory/items/';
+        let options = {
+            method: '',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Token ${token}`
+            }
+        };
         let method;
         switch (action) {
             case 'add':
                 method = 'POST';
+                endpoint = endpoint + "?me";
+                options.body = JSON.stringify(requestObject);
                 break;
             case 'edit':
                 method = 'PUT';
+                endpoint = endpoint + "?" + new URLSearchParams({id :requestObject.id});
+                options.body = JSON.stringify(requestObject);
                 break;
             case 'remove':
-                method = 'DELETE'
+                method = 'DELETE';
+                endpoint = endpoint + "?" + new URLSearchParams({id :requestObject.id});
+
+                
                 break;
         }
-        response = await fetch(BASE_API_URL + endpoint, {
-            method: method,
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Token ${token}`
-            },
-            //  credentials: "include",
-            body: JSON.stringify(requestObject),
-        });
+        options.method = method;
+
+        response = await fetch(BASE_API_URL + endpoint, options);
 
 
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        if (response.status == 204) {
+            return {response: "successful" };
         }
         // Parse the JSON response
         const data = await response.json();
