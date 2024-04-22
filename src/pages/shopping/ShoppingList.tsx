@@ -1,7 +1,8 @@
 
 import {
-  IonContent, IonHeader, IonSelect,IonInput, IonSelectOption, IonToolbar, IonButton, IonPage, IonButtons, IonIcon,
-  IonLabel, IonBackButton, IonList, IonItem, IonListHeader, IonFooter
+  IonContent, IonHeader, IonSelect, IonInput, IonSelectOption, IonToolbar, IonButton, IonPage, IonButtons, IonIcon,
+  IonLabel, IonBackButton, IonCheckbox, IonList, IonItem, IonListHeader, IonFooter, IonCol, IonGrid, IonRow, IonCard, IonCardContent, IonCardTitle, IonCardSubtitle, IonCardHeader,
+  IonTitle
 } from '@ionic/react';
 
 import {
@@ -10,7 +11,7 @@ import {
 } from "react-router-dom";
 
 import React, { useState, useRef, useEffect } from 'react';
-import { validateUnits, validateItemName, validateNumber} from '../../helper/Validation';
+import { validateUnits, validateItemName, validateNumber } from '../../helper/Validation';
 
 import { createOutline, addCircleOutline, logOut, person, trash } from 'ionicons/icons';
 import { getInventory, logout, concatenateArraysAndJoin } from '../../helper/APIRequest';
@@ -26,7 +27,7 @@ const ShoppingList = (props) => {
 
   const shoppinglist = shoppingLists.find((element) => Number(id) == element.id);
 
-  
+
   const [items, setItems] = useState(shoppinglist.itemList);
   const name = shoppinglist.name;
 
@@ -42,10 +43,10 @@ const ShoppingList = (props) => {
   const [isUserNameTouched, setIsUserNameTouched] = useState<boolean>(false);
   const [isQuantityTouched, setIsQuantityTouched] = useState<boolean>(false);
   const [isUnitsTouched, setIsUnitsTouched] = useState<boolean>(false);
-  
+
   const emptyItemState = {
-    "itemName":  "", // TODO: edit item payload used to populate these values
-    "quantity":  "",
+    "itemName": "", // TODO: edit item payload used to populate these values
+    "quantity": "",
     "units": "count"
   };
   let inputFieldStateMap = {
@@ -56,7 +57,7 @@ const ShoppingList = (props) => {
   }
 
   const [itemState, setItemState] = useState(emptyItemState);
-  
+
   let validationMethodMap = {
     "itemName": validateItemName,
     "quantity": validateNumber,
@@ -65,13 +66,13 @@ const ShoppingList = (props) => {
 
   const formInputClassName = (fieldName: string) => {
     const validateField = inputFieldStateMap[fieldName][0];
-    return `${validateField && 'ion-valid'} ${validateField === false && 'ion-invalid'} ${inputFieldStateMap[fieldName][2] && 'ion-touched'}`
+    return `${validateField && 'ion-valid'} ${validateField === false && 'ion-invalid'} ${inputFieldStateMap[fieldName][2] && 'ion-touched'} ion-padding-start`
   }
 
   // generic method for all input event callbacks.
   const validate = (ev: Event) => {
     const value = (ev.target as HTMLInputElement).value;
-    const fieldName = (ev.target as HTMLInputElement).label;
+    const fieldName = (ev.target as HTMLInputElement).id;
 
     // select the correct field
     const validateMethod = validationMethodMap[fieldName];
@@ -98,7 +99,7 @@ const ShoppingList = (props) => {
 
   };
 
-    
+
 
 
   const clearForms = () => {
@@ -126,10 +127,11 @@ const ShoppingList = (props) => {
     };
     //TODO: add an API call here.
 
-    dispatch({type: 'add-item', id: id, newItem: {...item} });
+    dispatch({ type: 'add-item', id: id, newItem: { ...item } });
     // as the update doesn't reflect right away, navlink doesn't probably support it
     // manually update the item list here.
-    setItems((items) => [...items, {...item
+    setItems((items) => [...items, {
+      ...item
     }]);
 
 
@@ -180,7 +182,7 @@ const ShoppingList = (props) => {
           <IonButtons slot="start">
             <IonBackButton defaultHref="/shopping"></IonBackButton>
           </IonButtons>
-          
+          <IonTitle>{name}</IonTitle>
         </IonToolbar>
       </IonHeader>
       <IonContent className="ion-padding">
@@ -198,94 +200,117 @@ const ShoppingList = (props) => {
           </IonListHeader>
           {items.map((item) =>
             <IonItem key={item.id}>
+              <IonCard>
+                <IonCardHeader>
+                  <IonCardTitle>{item.name + " "}</IonCardTitle>
+                </IonCardHeader>
+
+                <IonCardContent>
+                  <IonGrid class="ion-justify-content-between">
+                    <IonRow class="ion-align-self-center">
+                      <IonCol >{item.quantity + " "}</IonCol>
+                      <IonCol >{item.unit} </IonCol>
+                      <IonCol class="ion-align-items-end">
+                        <IonButton  id={"edit-item-" + item.id} className="edit-item" onClick={() => {
+
+                          //temporary
+                        }}>
+                          <IonIcon icon={createOutline} />
+                        </IonButton>
+                        <IonButton  onClick={() => {
+
+                          setItems(items => items.filter(i =>
+                            i.id !== item.id));
+                          dispatch({ type: 'remove-item', itemId: item.id, id: id });
+                        }}>
+                          <IonIcon icon={trash} />
+                        </IonButton>
+                        <IonCheckbox justify="end"></IonCheckbox>
+
+
+                      </IonCol>
+                    </IonRow>
+                  </IonGrid>
+                  {/* <IonLabel>
+
+                  </IonLabel> */}
+                </IonCardContent>
+
+              </IonCard>
               {/* <IonLabel>
-           {item.category + " "}
-         </IonLabel> */}
-              <IonLabel>
-                {item.name + " "}
-              </IonLabel>
-              <IonLabel>
+                
+              </IonLabel> */}
+              {/* <IonLabel>
                 {item.quantity + " "}
               </IonLabel>
               <IonLabel>
                 {item.unit}
-              </IonLabel>
-              <IonButton id={"edit-item-" + item.id} className="edit-item" onClick={() => {
+              </IonLabel> */}
 
-                //temporary
-              }}>
-                <IonIcon icon={createOutline} />
-              </IonButton>
-              <IonButton onClick={() => {
-
-                setItems(items => items.filter(i =>
-                  i.id !== item.id));
-                dispatch({type: 'remove-item', itemId: item.id, id: id });
-              }}>
-                <IonIcon icon={trash} />
-              </IonButton>
             </IonItem>)}
         </IonList>
       </IonContent>
       <IonFooter collapse="fade">
         <IonToolbar>
-        <IonItem >
-        <IonInput
-            type="text"
-            className={formInputClassName("itemName")}
-            label="itemName"
-            maxlength={40}
-            label-placement="stacked"
-            placeholder="Name of inventory item"
-            value={itemState.itemName}
-            // errorText={errorLabels["itemName"]}
-            onIonBlur={() => inputFieldStateMap["itemName"][3](true)}
-            onIonInput={(event) => validate(event)}
-          ></IonInput>
-   
-   
-          <IonInput
-            type="number"
-            className={formInputClassName("quantity")}
-            label="quantity"
-            label-placement="stacked"
-            step="1"
-            min="1"
-            value={itemState.quantity}
-            errorText="Only positive numbers allowed"
-            onIonBlur={() => inputFieldStateMap["quantity"][3](true)}
-            onIonInput={(event) => validate(event)}
-          ></IonInput>
+          <IonItem >
+            <IonInput
+              type="text"
+              className={formInputClassName("itemName")}
+              label="Name"
+              id="itemName"
+              maxlength={40}
+              label-placement="stacked"
+              placeholder="Shopping list item"
+              value={itemState.itemName}
+              onIonBlur={() => inputFieldStateMap["itemName"][3](true)}
+              onIonInput={(event) => validate(event)}
+            ></IonInput>
 
-          <IonSelect
-            aria-label="Units"
-            label="units"
-            interface="popover"
-            className={formInputClassName("units")}
-            value={itemState.units}
-            onIonChange={(event) => { setItemState((state) => { return { ...itemState, units: state }; }); validate(event); }}
-            onIonBlur={() => inputFieldStateMap["units"][3](true)}
-            onIonCancel={() => console.log('ionCancel fired')}
-            onIonDismiss={() => console.log('ionDismiss fired')}
-            placeholder="Select units">
-            {/*  TODO: hook up the units list here  */}
-            {unitTypes.map((unit: object) => (
-              <IonSelectOption key={unit.id} value={unit.name}>
-                {unit.name}
-              </IonSelectOption>
-            ))}
-          </IonSelect>
-        </IonItem>
-        <IonButtons slot="end">
+
+            <IonInput
+              type="number"
+              className={formInputClassName("quantity")}
+              label="Quantity"
+              id="quantity"
+              label-placement="stacked"
+              step="1"
+              min="1"
+              value={itemState.quantity}
+              errorText="Only positive numbers allowed"
+              onIonBlur={() => inputFieldStateMap["quantity"][3](true)}
+              onIonInput={(event) => validate(event)}
+            ></IonInput>
+
+            <IonSelect
+              aria-label="Units"
+              label="Units"
+              id="units"
+              interface="popover"
+              className={formInputClassName("units")}
+              value={itemState.units}
+              onIonChange={(event) => { setItemState((state) => { return { ...itemState, units: state }; }); validate(event); }}
+              onIonBlur={() => inputFieldStateMap["units"][3](true)}
+              onIonCancel={() => console.log('ionCancel fired')}
+              onIonDismiss={() => console.log('ionDismiss fired')}
+              placeholder="Select units">
+              {/*  TODO: hook up the units list here  */}
+              {unitTypes.map((unit: object) => (
+                <IonSelectOption key={unit.id} value={unit.name}>
+                  {unit.name}
+                </IonSelectOption>
+              ))}
+            </IonSelect>
+          </IonItem>
+          <IonButtons slot="end">
             <IonButton
               strong={true}
               disabled={!(isItemNameValid && isQuantityValid &&
-                isUnitsValid )}
+                isUnitsValid)}
               onClick={() => {
                 confirm();
                 clearForms();
               }}>
-                <IonIcon slot="icon-only" icon={addCircleOutline}></IonIcon>
+              <IonIcon slot="icon-only" icon={addCircleOutline}></IonIcon>
             </IonButton>
           </IonButtons>
         </IonToolbar>
