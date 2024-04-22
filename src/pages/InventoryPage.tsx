@@ -240,7 +240,8 @@ function Inventory(props:any)
           <IonButton size="default" expand={"block"} id={"AddInventoryItem"}>
             <IonIcon slot="icon-only" icon={addCircle}></IonIcon>
           </IonButton> 
-          <AddEditItemModal modalTriggerID={"AddInventoryItem"} actionConfirm={addEditItemToList} action="add" {...props}
+          <AddEditItemModal modalTriggerID={"AddInventoryItem"} 
+          actionConfirm={addEditItemToList} kitchenTabs={props.kitchenTabs} action="add" {...props}
             />
           </IonItem>
           </IonList>
@@ -438,7 +439,11 @@ const InventoryPage = (props:any) => {
     
   }
   
-  const getInventoryComponent = (location:any) => (<Inventory inventoryItems={inventoryItems} setInventoryItems={setInventoryItems} token={props.token} location={location}/>);
+  const getInventoryComponent = (location:any) => (
+  <Inventory inventoryItems={inventoryItems} 
+  setInventoryItems={setInventoryItems}
+  kitchenTabs={kitchenTabs}
+   token={props.token} location={location}/>);
   
   return (<IonPage>
   <IonHeader>      

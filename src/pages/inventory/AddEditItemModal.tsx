@@ -50,7 +50,7 @@ let errorLabels = {
 
 
 
-const AddEditItemModal = (props) => {
+const AddEditItemModal = (props:any) => {
 
   // props.item, props.token, props.action = "add" or "edit"
 
@@ -65,17 +65,24 @@ const AddEditItemModal = (props) => {
   const editItem = action == EDIT ? props.editItem : '';
   const listItems = props.listItems;
 
+  let locationTabList:any = [];
 
-
-
+  if(props.kitchenTabs === undefined)
+  {
+     
+  }
+  else
+  {
+    locationTabList = props.kitchenTabs;
+  }
   // set a consistent list of options for each field
 
   // accept no selection also
-  const locationTabList =
-    [{ id: 1, name: "Kitchen" },
+   
+   /* [{ id: 1, name: "Kitchen" },
     { id: 2, name: "Pantry" },
     { id: 3, name: "Cabinet" }
-    ]// props.locationTabList;
+    ]// props.locationTabList;*/
   const categoryList = [{ id: 1, name: "Fruit" },
   { id: 2, name: "Grocery" },
   { id: 3, name: "Water" },
@@ -363,8 +370,8 @@ const AddEditItemModal = (props) => {
             onIonCancel={() => console.log('ionCancel fired')}
             onIonDismiss={() => console.log('ionDismiss fired')}
             placeholder="Select location tab">
-            {locationTabList.map((loc: object) => (
-              <IonSelectOption key={loc.id} value={loc.name}>
+            {locationTabList.map((loc: any) => (
+              <IonSelectOption key={loc.locationID} value={loc.name}>
                 {loc.name}
               </IonSelectOption>
             ))}

@@ -380,15 +380,30 @@ export async function addEditItems(requestObject: Object,token: String, action: 
                 method = 'DELETE'
                 break;
         }
-         response = await fetch(BASE_API_URL + endpoint, {
-            method: method,
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Token ${token}`
-            },
-            //  credentials: "include",
-            body: JSON.stringify(requestObject),
-        });
+        if(action === 'add'){
+            response = await fetch(BASE_API_URL + endpoint + "?me", {
+                method: method,
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Token ${token}`
+                },
+                //  credentials: "include",
+                body: JSON.stringify(requestObject),
+            });
+        }   
+        else 
+        {
+            response = await fetch(BASE_API_URL + endpoint, {
+                method: method,
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Token ${token}`
+                },
+                //  credentials: "include",
+                body: JSON.stringify(requestObject),
+            });
+        }
+         
 
 
         if (!response.ok) {
