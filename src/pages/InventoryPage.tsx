@@ -507,11 +507,11 @@ const InventoryPage = (props:any) => {
   <IonReactRouter>
         {<IonTabs>
           <IonRouterOutlet>         
-          {<Redirect exact path="/inventory" to="/Inventory/Kitchen"/>}
+          {/* {<Redirect exact path="/inventory" to="/kitchen"/>} */}
           {/*  render={()=> getInventoryComponent("kitchen")} */}
           {
                kitchenTabs.map((tab:any)=> 
-                <Route path={"/Inventory/"+tab.name} 
+                <Route path={tab.name} 
                render={()=>getInventoryComponent(tab.name)} exact={true}/>
               )
           }
@@ -524,7 +524,7 @@ const InventoryPage = (props:any) => {
           <IonTabBar slot="top">                       
             {
               kitchenTabs.map((tab:any)=>
-                <IonTabButton tab={tab.name} href={'/Inventory/' + tab.name}>
+                <IonTabButton tab={tab.name} href={tab.name}>
                   <IonLabel>{tab.name}</IonLabel>
                 </IonTabButton>
               )
