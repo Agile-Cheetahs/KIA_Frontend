@@ -2,7 +2,7 @@
 import {
   IonContent, IonHeader, IonSelect, IonInput, IonSelectOption, IonToolbar, IonButton, IonPage, IonButtons, IonIcon,
   IonLabel, IonBackButton, IonCheckbox, IonList, IonItem, IonListHeader, IonFooter, IonCol, IonGrid, IonRow, IonCard, IonCardContent, IonCardTitle, IonCardSubtitle, IonCardHeader,
-  IonTitle
+  IonTitle, useIonToast, IonModal
 } from '@ionic/react';
 
 import {
@@ -14,24 +14,82 @@ import React, { useState, useRef, useEffect } from 'react';
 import { validateUnits, validateItemName, validateNumber } from '../../helper/Validation';
 
 import { createOutline, addCircleOutline, logOut, person, trash } from 'ionicons/icons';
-import { getInventory, logout, concatenateArraysAndJoin } from '../../helper/APIRequest';
+import { getInventory, fetchShoppingListItems, concatenateArraysAndJoin } from '../../helper/APIRequest';
 
 
 
 
 const ShoppingList = (props) => {
 
+  const [errorToast] = useIonToast();
+  const [messageToast] = useIonToast();
+
   let shoppingLists = props.shoppingLists;
   let dispatch = props.dispatch;
   let id = props.id;
+  let action = props.action || "add";
+  const { showLoading: showLoading, hideLoading: hideLoading, token: token } = props
 
   const shoppinglist = shoppingLists.find((element) => Number(id) == element.id);
 
 
-  const [items, setItems] = useState(shoppinglist.itemList);
-  const name = shoppinglist.name;
 
-  const action = "ADD";
+
+  const [items, setItems] = useState([]);
+
+  useEffect(() => {
+    //fetch inventory id and items if not found
+    // TODO:
+
+    // showL();
+    // (async () => await showLoading())();
+    fetchShoppingListItems({}, props.token, "GET", { id: id }).then((resp) => {
+      if (resp.response == "failed") {
+
+
+        // merge together all response error message for a toast message.
+        const msg = concatenateArraysAndJoin(resp.data);
+
+        errorToast({
+          message: resp.detail,
+          duration: 1500,
+          position: "top",
+          color: "warning"
+        });
+
+      }
+
+
+      else if (resp.response == "successful") {
+
+        dispatch({ id: id, items: resp.items, type: 'fetch-listitems' });
+        setItems(resp.items.map((item) => ({ ...item, id: item.item_id })));
+
+        //   messageToast({
+        //     message: msg,
+        //     duration: 1500,
+        //     position: "top",
+        //     color: "success"
+        //   });
+      }
+      // (async () => await hideLoading())();
+
+    })
+      .catch((err) => {
+        const msg = concatenateArraysAndJoin(err.data);
+
+        errorToast({
+          message: msg,
+          duration: 1500,
+          position: "top",
+          color: "warning"
+        });
+        // (async () => await hideLoading())();
+
+      });
+
+  }, [props.id]);
+  const name = shoppinglist.name;
 
   // Add shopping list item form.
   const [isItemNameValid, setIsItemNameValid] = useState<boolean>(false);
@@ -44,22 +102,25 @@ const ShoppingList = (props) => {
   const [isQuantityTouched, setIsQuantityTouched] = useState<boolean>(false);
   const [isUnitsTouched, setIsUnitsTouched] = useState<boolean>(false);
 
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+
   const emptyItemState = {
-    "itemName": "", // TODO: edit item payload used to populate these values
+    "name": "", // TODO: edit item payload used to populate these values
     "quantity": "",
-    "units": "count"
+    "units": "count",
+    "crossed": false
   };
   let inputFieldStateMap = {
     //            0, `1, 2, 3
-    "itemName": [isItemNameValid, setIsItemNameValid, isUserNameTouched, setIsUserNameTouched],
+    "name": [isItemNameValid, setIsItemNameValid, isUserNameTouched, setIsUserNameTouched],
     "quantity": [isQuantityValid, setIsQuantityValid, isQuantityTouched, setIsQuantityTouched],
     "units": [isUnitsValid, setIsUnitsValid, isUnitsTouched, setIsUnitsTouched]
   }
-
+  // add item state
   const [itemState, setItemState] = useState(emptyItemState);
 
   let validationMethodMap = {
-    "itemName": validateItemName,
+    "name": validateItemName,
     "quantity": validateNumber,
     "units": validateUnits,
   }
@@ -112,7 +173,7 @@ const ShoppingList = (props) => {
   }
 
 
-  function confirm() {
+  function confirm(action, item_id) {
     // TODO: construct add/edit API method payload
     const addShoppingItem = { ...itemState };
 
@@ -120,49 +181,68 @@ const ShoppingList = (props) => {
 
     const item = {
       //full name string split here
-      "name": addShoppingItem.itemName,
+      "name": addShoppingItem.name,
       "quantity": addShoppingItem.quantity,
       "unit": addShoppingItem.units,
-      "id": 3
+      "crossed": addShoppingItem.crossed
     };
-    //TODO: add an API call here.
-
-    dispatch({ type: 'add-item', id: id, newItem: { ...item } });
-    // as the update doesn't reflect right away, navlink doesn't probably support it
-    // manually update the item list here.
-    setItems((items) => [...items, {
-      ...item
-    }]);
+    showLoading().then(() => fetchShoppingListItems(item, props.token, action == "add" ? "POST" : "PUT", { id: id, item_id: item_id })).then((resp) => {
+      if (resp.response == "failed") {
 
 
-    // if (action == EDIT) {
-    //   // TODO: add string to the end
-    //   addEditRequest.id = editItem.id;
-    // }
-    // addEditItems(addEditRequest, props.token, action == ADD).then((resp) => {
-    //   if (resp.response == "failed") {
-    //     const msg = concatenateArraysAndJoin(resp.data);
+        // merge together all response error message for a toast message.
+        const msg = concatenateArraysAndJoin(resp.data);
 
-    //     errorToast({
-    //       message: msg,
-    //       duration: 1500,
-    //       position: "top",
-    //       color: "warning"
-    //     });
+        errorToast({
+          message: resp.detail,
+          duration: 1500,
+          position: "top",
+          color: "warning"
+        });
+
+      }
 
 
-    //   } else if (resp.response == "successful") {
+      else if (resp.response == "successful") {
 
-    //     messageToast({
-    //       message: `User ${action == EDIT ? "edited" : "added"} item succesfully!`,
-    //       duration: 1500,
-    //       position: "top",
-    //       color: "success"
-    //     });
-    //     props.actionConfirm(action, addEditRequest);
+        dispatch({ id: id, newItem: { ...resp, id: resp.item_id }, type: 'add-item' });
 
-    //   }
-    // });
+        // as the update doesn't reflect right away, navlink doesn't probably support it
+        // manually update the item list here.
+        if (action == "edit") {
+          dispatch({ id: id, newItem: { ...resp, id: resp.item_id }, type: 'edit-item' });
+          setItems((items) => items.map(item =>
+            item.id === action.itemId ? action.newItem : item
+          ));
+        }
+        else {
+          dispatch({ id: id, newItem: { ...resp, id: resp.item_id }, type: 'add-item' });
+          setItems((items) => [...items, { ...resp, id: resp.item_id }]);
+        }
+
+
+        messageToast({
+          message: `Shopping item ${resp.name} added successfully!`,
+          duration: 1500,
+          position: "top",
+          color: "success"
+        });
+      }
+      // (async () => await hideLoading())();
+
+    })
+      .catch((err) => {
+        const msg = concatenateArraysAndJoin(err.data);
+
+        errorToast({
+          message: msg,
+          duration: 1500,
+          position: "top",
+          color: "warning"
+        });
+
+      }
+      ).then(() => hideLoading());
 
 
   }
@@ -187,7 +267,7 @@ const ShoppingList = (props) => {
       </IonHeader>
       <IonContent className="ion-padding">
         <IonList>
-          <IonListHeader className={"shoppinglist-item-headers"}>
+          {/* <IonListHeader className={"shoppinglist-item-headers"}>
             <IonLabel>
               <b>Name</b>
             </IonLabel>
@@ -197,7 +277,7 @@ const ShoppingList = (props) => {
             <IonLabel>
               <b>Units</b>
             </IonLabel>
-          </IonListHeader>
+          </IonListHeader> */}
           {items.map((item) =>
             <IonItem key={item.id}>
               <IonCard>
@@ -208,20 +288,68 @@ const ShoppingList = (props) => {
                 <IonCardContent>
                   <IonGrid class="ion-justify-content-between">
                     <IonRow class="ion-align-self-center">
-                      <IonCol >{item.quantity + " "}</IonCol>
+                      <IonCol size="auto">{item.quantity + " "}</IonCol>
                       <IonCol >{item.unit} </IonCol>
                       <IonCol class="ion-align-items-end">
-                        <IonButton  id={"edit-item-" + item.id} className="edit-item" onClick={() => {
+                        <IonButton id={"edit-item-" + item.id} className="edit-item" onClick={() => {
+                          
+                          clearForms();
+                          setItemState(item);
+                          setIsEditModalOpen(true);
 
                           //temporary
                         }}>
                           <IonIcon icon={createOutline} />
                         </IonButton>
-                        <IonButton  onClick={() => {
+                        <IonButton onClick={() => {
 
-                          setItems(items => items.filter(i =>
-                            i.id !== item.id));
-                          dispatch({ type: 'remove-item', itemId: item.id, id: id });
+                          // setItems(items => items.filter(i =>
+                          //   i.id !== item.id));
+                          // API CALL for remove
+                          showLoading().then(() => fetchShoppingListItems({}, props.token, "DELETE", { id: id, item_id: item.id })).then((resp) => {
+                            if (resp.response == "failed") {
+
+
+                              // merge together all response error message for a toast message.
+                              const msg = concatenateArraysAndJoin(resp.data);
+
+                              errorToast({
+                                message: resp.detail,
+                                duration: 1500,
+                                position: "top",
+                                color: "warning"
+                              });
+
+                            }
+
+
+                            else if (resp.response == "successful") {
+
+                              //setItems((items) => [...items, { ...resp, id: resp.item_id }]);
+                              dispatch({ type: 'remove-item', itemId: item.id, id: id });
+                              messageToast({
+                                message: `Item ${item.name} has been removed successfully`,
+                                duration: 1500,
+                                position: "top",
+                                color: "success"
+                              });
+                            }
+
+
+                          })
+                            .catch((err) => {
+                              const msg = concatenateArraysAndJoin(err.data);
+
+                              errorToast({
+                                message: msg,
+                                duration: 1500,
+                                position: "top",
+                                color: "warning"
+                              });
+
+                            }
+                            ).then(() => hideLoading());
+
                         }}>
                           <IonIcon icon={trash} />
                         </IonButton>
@@ -249,20 +377,93 @@ const ShoppingList = (props) => {
 
             </IonItem>)}
         </IonList>
+        <IonModal isOpen={isEditModalOpen}>
+          <IonHeader>
+            <IonToolbar>
+              <IonTitle>Edit Shopping list item</IonTitle>
+              <IonButtons slot="end">
+                <IonButton
+                  strong={true}
+                  disabled={!(isItemNameValid && isQuantityValid &&
+                    isUnitsValid)}
+                  onClick={() => {
+                    confirm('edit', itemState.id);
+                    clearForms();
+                    setIsEditModalOpen(false);
+                  }}>Confirm</IonButton>
+              </IonButtons>
+        
+              <IonButtons slot="end">
+                <IonButton onClick={() => setIsEditModalOpen(false)}>Close</IonButton>
+              </IonButtons>
+            </IonToolbar>
+          </IonHeader>
+          <IonContent className="ion-padding">
+            <IonItem >
+              <IonInput
+                type="text"
+                className={formInputClassName("name")}
+                label="Name"
+                id="name"
+                maxlength={40}
+                label-placement="stacked"
+                placeholder="Shopping list item"
+                value={itemState.name}
+                onIonBlur={() => inputFieldStateMap["name"][3](true)}
+                onIonInput={(event) => validate(event)}
+              ></IonInput>
+
+
+              <IonInput
+                type="number"
+                className={formInputClassName("quantity")}
+                label="Quantity"
+                id="quantity"
+                label-placement="stacked"
+                step="1"
+                min="1"
+                value={itemState.quantity}
+                errorText="Only positive numbers allowed"
+                onIonBlur={() => inputFieldStateMap["quantity"][3](true)}
+                onIonInput={(event) => validate(event)}
+              ></IonInput>
+
+              <IonSelect
+                aria-label="Units"
+                label="Units"
+                id="units"
+                interface="popover"
+                className={formInputClassName("units")}
+                value={itemState.units}
+                onIonChange={(event) => { setItemState((state) => { return { ...itemState, units: state }; }); validate(event); }}
+                onIonBlur={() => inputFieldStateMap["units"][3](true)}
+                onIonCancel={() => console.log('ionCancel fired')}
+                onIonDismiss={() => console.log('ionDismiss fired')}
+                placeholder="Select units">
+                {/*  TODO: hook up the units list here  */}
+                {unitTypes.map((unit: object) => (
+                  <IonSelectOption key={unit.id} value={unit.name}>
+                    {unit.name}
+                  </IonSelectOption>
+                ))}
+              </IonSelect>
+            </IonItem>
+          </IonContent>
+        </IonModal>
       </IonContent>
       <IonFooter collapse="fade">
         <IonToolbar>
           <IonItem >
             <IonInput
               type="text"
-              className={formInputClassName("itemName")}
+              className={formInputClassName("name")}
               label="Name"
-              id="itemName"
+              id="name"
               maxlength={40}
               label-placement="stacked"
               placeholder="Shopping list item"
-              value={itemState.itemName}
-              onIonBlur={() => inputFieldStateMap["itemName"][3](true)}
+              value={itemState.name}
+              onIonBlur={() => inputFieldStateMap["name"][3](true)}
               onIonInput={(event) => validate(event)}
             ></IonInput>
 
@@ -307,7 +508,7 @@ const ShoppingList = (props) => {
               disabled={!(isItemNameValid && isQuantityValid &&
                 isUnitsValid)}
               onClick={() => {
-                confirm();
+                confirm('add',"");
                 clearForms();
               }}>
               <IonIcon slot="icon-only" icon={addCircleOutline}></IonIcon>
