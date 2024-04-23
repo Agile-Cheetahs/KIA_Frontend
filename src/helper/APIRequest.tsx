@@ -123,10 +123,10 @@ export async function logout(requestObject: any) {
     }
 }
 
-export async function addInventoryLocation(requestObject: any)
+export async function addInventoryLocation(requestObject: any, token: any)
 {
     let response;
-    let token = requestObject.token
+    //let token = requestObject.token
     //delete requestObject.token 
 
     try {
@@ -321,12 +321,56 @@ export async function addInventory(requestObject: any, method: string) {
     }
 }
 
-
+/**
+ * This get Inventory Creates the inventory.  
+ * @param requestObject 
+ * @returns 
+ */
 export async function getInventory(requestObject: any) {
     let response;
     try {
 
         const endpoint = '/api/inventory/me/';
+
+        response = await fetch(BASE_API_URL + endpoint, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Token ${requestObject.token}`
+            },
+            //  credentials: "include",
+
+        });
+
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        // Parse the JSON response
+        const data = await response.json();
+
+        // Return the data
+        return { ...data, response: "successful" };
+
+    }
+    catch (error: any) {
+        // Log any errors to the console
+        console.error("There has been a problem with your fetch operation:", error);
+        const data = await response.json();
+        return { response: "failed", status: error.msg, data: data };
+    }
+}
+
+/**
+ * This gets my Inventory but doesn't create.  
+ * @param requestObject 
+ * @returns 
+ */
+export async function getMyInventory(requestObject: any) {
+    let response;
+    try {
+
+        const endpoint = '/api/inventory/items/?me/';
 
         response = await fetch(BASE_API_URL + endpoint, {
             method: 'GET',
@@ -392,32 +436,9 @@ export async function addEditItems(requestObject: Object, token: String, action:
                 
                 break;
         }
-        if(action === 'add'){
-            response = await fetch(BASE_API_URL + endpoint + "?me", {
-                method: method,
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Token ${token}`
-                },
-                //  credentials: "include",
-                body: JSON.stringify(requestObject),
-            });
-        }   
-        else 
-        {
-            response = await fetch(BASE_API_URL + endpoint, {
-                method: method,
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Token ${token}`
-                },
-                //  credentials: "include",
-                body: JSON.stringify(requestObject),
-            });
-        }
         options.method = method;
 
-
+        response = await fetch(BASE_API_URL + endpoint, options);
 
 
         if (!response.ok) {

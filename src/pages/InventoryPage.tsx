@@ -11,7 +11,7 @@ import { useNavigate } from 'react-router-dom';
 
 import './InventoryPage.css';
 import {addCircle, trash, createOutline} from 'ionicons/icons';
-import { addInventoryLocation, removeInventoryLocation, editInventoryTab} from '../helper/APIRequest';
+import { addInventoryLocation, removeInventoryLocation, editInventoryTab, getMyInventory} from '../helper/APIRequest';
 import AddEditItemModal from './inventory/AddEditItemModal';
 import AddEditTabsModal from './inventory/AddEditTabsModal';
 
@@ -370,9 +370,7 @@ const InventoryPage = (props:any) => {
    */
   function addLocationTab(tab:any)
   {
-    addInventoryLocation({ "name": tab[0],
-      "token": props.token                        
-    }).then((resp) => {
+    addInventoryLocation({ "name": tab[0]}, token).then((resp) => {
       if (resp.response == "failed") {
         const msg = concatenateArraysAndJoin(resp.data);        
 
