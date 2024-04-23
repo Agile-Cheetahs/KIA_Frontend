@@ -143,8 +143,7 @@ function InventoryItemView(props:any){
               <IonIcon icon={createOutline}/>
             </IonButton>                   
             <IonButton onClick={()=>{
-             props.setInventoryItems(props.inventoryItems.filter(
-              (a:any)=>a.name !== props.itemName));
+            
               props.showLoading();
               addEditItems({id: props.id }, props.token, "remove").then((resp) => {
                 if (resp.response == "failed") {
@@ -159,7 +158,8 @@ function InventoryItemView(props:any){
           
           
                 } else if (resp.response == "successful") {
-          
+                  props.setInventoryItems(props.inventoryItems.filter(
+                    (a:any)=>a.name !== props.itemName));
                   props.messageToast({
                     message: `User removed item succesfully!`,
                     duration: 1500,
@@ -427,6 +427,7 @@ const InventoryPage = (props:any) => {
           if(elemItem.location === oldTab){
             elemItem.location = newTab;
           }
+          return elemItem;
         });
         setInventoryItems(updatedInventory);
       }      
@@ -441,7 +442,7 @@ const InventoryPage = (props:any) => {
   <Inventory inventoryItems={inventoryItems} 
   setInventoryItems={setInventoryItems}
   kitchenTabs={kitchenTabs}
-   token={props.token} location={location}/>);
+   token={props.token} location={location} {...props} errorToast={errorToast} messageToast={messageToast}/>);
   
   return (<IonPage>
   <IonHeader>      
