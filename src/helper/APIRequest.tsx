@@ -463,6 +463,8 @@ export async function addEditItems(requestObject: Object, token: String, action:
     }
 }
 
+
+// Shopping List
 export async function fetchShoppingList(requestObject: any, token: String, method: string) {
     let response;
     //delete requestObject.token 
@@ -489,6 +491,77 @@ export async function fetchShoppingList(requestObject: any, token: String, metho
 
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        // Parse the JSON response
+        const data = await response.json();
+
+        // Return the data
+        return { ...data, response: "successful" };
+
+    }
+    catch (error: any) {
+        // Log any errors to the console
+        console.error("There has been a problem with your fetch operation:", error);
+        const data = await response.json();
+        return { response: "failed", status: error.msg, data: data };
+    }
+}
+
+export async function fetchShoppingListItems(requestObject: any, token: String, method: string, query: Object = {}) {
+    let response;
+    //delete requestObject.token 
+
+    try {
+
+       let endpoint = '/api/inventory/shopping-lists/';
+        const options = {
+            method: method,
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Token ${token}`
+            }
+
+        };
+        // if (method != "GET") 
+        // { 
+        //     options.body = JSON.stringify(requestObject); 
+        // }
+
+        if (method == "GET") {
+            
+            endpoint +=  `${query.id}/`;
+        }
+        else if (method == "POST") {
+            options.body = JSON.stringify(requestObject); 
+            endpoint +=  `${query.id}/items/`;
+        }
+        else if (method == "PUT") {
+            
+            endpoint +=  `${query.id}/items/${query.item_id}/`;
+            options.body = JSON.stringify(requestObject); 
+        }
+
+        else if (method == "DELETE") {
+            
+            endpoint +=  `${query.id}/items/${query.item_id}/`;
+            
+        }
+
+
+
+
+
+
+
+        response = await fetch(BASE_API_URL + endpoint, options);
+
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        if (response.status == 204) {
+            return {response: "successful" };
         }
         // Parse the JSON response
         const data = await response.json();
