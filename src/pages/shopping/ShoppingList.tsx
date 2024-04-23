@@ -103,6 +103,7 @@ const ShoppingList = (props) => {
   const [isUnitsTouched, setIsUnitsTouched] = useState<boolean>(false);
 
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const modal = useRef<HTMLIonModalElement>(null);
 
   const emptyItemState = {
     "name": "", // TODO: edit item payload used to populate these values
@@ -291,11 +292,11 @@ const ShoppingList = (props) => {
                       <IonCol size="auto">{item.quantity + " "}</IonCol>
                       <IonCol >{item.unit} </IonCol>
                       <IonCol class="ion-align-items-end">
-                        <IonButton id={"edit-item-" + item.id} className="edit-item" onClick={() => {
+                        <IonButton id="open-modal" className="edit-item" onClick={() => {
                           
                           clearForms();
                           setItemState(item);
-                          setIsEditModalOpen(true);
+                          // setIsEditModalOpen(true);
 
                           //temporary
                         }}>
@@ -325,7 +326,8 @@ const ShoppingList = (props) => {
 
                             else if (resp.response == "successful") {
 
-                              //setItems((items) => [...items, { ...resp, id: resp.item_id }]);
+                              setItems((items) => [ ...items.filter(i =>
+                                item.id !== i.id)]);
                               dispatch({ type: 'remove-item', itemId: item.id, id: id });
                               messageToast({
                                 message: `Item ${item.name} has been removed successfully`,
@@ -353,31 +355,7 @@ const ShoppingList = (props) => {
                         }}>
                           <IonIcon icon={trash} />
                         </IonButton>
-                        <IonCheckbox justify="end"></IonCheckbox>
-
-
-                      </IonCol>
-                    </IonRow>
-                  </IonGrid>
-                  {/* <IonLabel>
-
-                  </IonLabel> */}
-                </IonCardContent>
-
-              </IonCard>
-              {/* <IonLabel>
-                
-              </IonLabel> */}
-              {/* <IonLabel>
-                {item.quantity + " "}
-              </IonLabel>
-              <IonLabel>
-                {item.unit}
-              </IonLabel> */}
-
-            </IonItem>)}
-        </IonList>
-        <IonModal isOpen={isEditModalOpen}>
+                        <IonModal ref={modal} trigger="open-modal"  onDidDismiss={(ev)=> {}}>
           <IonHeader>
             <IonToolbar>
               <IonTitle>Edit Shopping list item</IonTitle>
@@ -389,12 +367,12 @@ const ShoppingList = (props) => {
                   onClick={() => {
                     confirm('edit', itemState.id);
                     clearForms();
-                    setIsEditModalOpen(false);
+                    modal.current?.dismiss();
                   }}>Confirm</IonButton>
               </IonButtons>
         
               <IonButtons slot="end">
-                <IonButton onClick={() => setIsEditModalOpen(false)}>Close</IonButton>
+                <IonButton onClick={() => modal.current?.dismiss()}>Close</IonButton>
               </IonButtons>
             </IonToolbar>
           </IonHeader>
@@ -450,6 +428,31 @@ const ShoppingList = (props) => {
             </IonItem>
           </IonContent>
         </IonModal>
+                        <IonCheckbox justify="end"></IonCheckbox>
+
+
+                      </IonCol>
+                    </IonRow>
+                  </IonGrid>
+                  {/* <IonLabel>
+
+                  </IonLabel> */}
+                </IonCardContent>
+
+              </IonCard>
+              {/* <IonLabel>
+                
+              </IonLabel> */}
+              {/* <IonLabel>
+                {item.quantity + " "}
+              </IonLabel>
+              <IonLabel>
+                {item.unit}
+              </IonLabel> */}
+
+            </IonItem>)}
+        </IonList>
+        
       </IonContent>
       <IonFooter collapse="fade">
         <IonToolbar>
